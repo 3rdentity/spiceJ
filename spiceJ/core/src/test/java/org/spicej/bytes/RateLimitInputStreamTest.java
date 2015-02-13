@@ -32,7 +32,8 @@ public class RateLimitInputStreamTest {
 
          @Override
          public boolean idle() {
-            if(autoAdvance) t.advance();
+            if (autoAdvance)
+               t.advance();
             return autoAdvance;
          }
 
@@ -45,10 +46,11 @@ public class RateLimitInputStreamTest {
       t.advance();
       t0 = t.getCurrentTick();
    }
-   
+
+   @Test
    public void testAvailable() throws IOException {
       autoAdvance = false;
-      
+
       assertEquals(10, sut.available());
       sut.read(buffer, 0, 3);
       assertEquals(7, sut.available());
@@ -56,9 +58,9 @@ public class RateLimitInputStreamTest {
       assertEquals(1, sut.available());
       sut.read(buffer, 0, 1);
       assertEquals(0, sut.available());
-      
+
       t.advance();
-      
+
       assertEquals(10, sut.available());
       sut.read(buffer, 0, 3);
       assertEquals(7, sut.available());
@@ -70,6 +72,10 @@ public class RateLimitInputStreamTest {
       t.advance();
 
       assertEquals(10, sut.available());
+
+      assertEquals(3, sut.read(buffer, 0, 3));
+      
+      assertEquals(7, sut.available());
    }
 
    @Test
@@ -106,12 +112,12 @@ public class RateLimitInputStreamTest {
       assertEquals(t0 + 24, t.getCurrentTick());
       assertEquals(250, rd);
    }
-   
+
    @Test
    public void testEof() throws IOException {
       singleread(249);
       pos.close();
-      
+
       int rd = sut.read(buffer, 0, 5);
       assertEquals(1, rd);
       rd = sut.read(buffer, 0, 5);
@@ -140,14 +146,23 @@ public class RateLimitInputStreamTest {
       singleread(33);
       assertEquals(t0 + 3, t.getCurrentTick());
    }
-   
+
    @Test
    public void testSingleEof() throws IOException {
       singleread(249);
       pos.close();
-      
+
       int rd = sut.read(buffer, 0, 5);
       assertEquals(1, rd);
       assertEquals(-1, sut.read());
+   }
+
+   @Test
+   public void testVariableByterate() throws IOException {
+      int rd = sut.read(buffer, 0, 13);
+      assertEquals(t0 + 1, t.getCurrentTick());
+      assertEquals(13, rd);
+      
+      assertEquals(7, sut.available());
    }
 }

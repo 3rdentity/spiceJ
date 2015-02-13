@@ -62,15 +62,15 @@ public class RateHelper {
    private class Listener implements TickListener {
       @Override
       public void tick(long tick) {
-         int stored;
+         int value;
          while (true) {
-            stored = spent.get();
-            if (stored > bytesPerTick && spent.compareAndSet(stored, stored - bytesPerTick))
+            int stored = spent.get();
+            if (stored > bytesPerTick && spent.compareAndSet(stored, value = (stored - bytesPerTick)))
                break;
-            else if (spent.compareAndSet(stored, 0))
+            else if (spent.compareAndSet(stored, (value = 0)))
                break;
          }
-         timewiseAvailable = (int) (bytesPerTick - stored);
+         timewiseAvailable = (int) (bytesPerTick - value);
          wakeup();
       }
    }
@@ -89,12 +89,13 @@ public class RateHelper {
          else if (spent.compareAndSet(stored, stored + lenToTake))
             break;
       }
+      timewiseAvailable -= lenToTake;
       return lenToTake;
    }
 
    public void giveBack(int len) {
       spent.addAndGet(-len);
-      timewiseAvailable -= len;
+      timewiseAvailable += len;
       wakeup();
    }
 

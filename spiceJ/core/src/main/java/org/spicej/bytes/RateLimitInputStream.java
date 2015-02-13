@@ -3,6 +3,7 @@ package org.spicej.bytes;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.spicej.bytes.RateHelper.IdleNotify;
 import org.spicej.shapers.RateShaper;
 import org.spicej.ticks.TickSource;
 
@@ -11,10 +12,12 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
 
    private final RateHelper rateHelper;
 
-   public RateLimitInputStream(InputStream real, TickSource tickSource, int bytesPerTick) {
+   private boolean boring = false;
+
+   public RateLimitInputStream(InputStream real, TickSource tickSource, int bytesPerTick, int prescaler) {
       this.real = real;
 
-      this.rateHelper = new RateHelper(tickSource, bytesPerTick);
+      this.rateHelper = new RateHelper(tickSource, bytesPerTick, prescaler);
    }
 
    @Override
@@ -32,8 +35,8 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
    @Override
    public int read(byte[] b, int off, int len) throws IOException {
       int done = 0;
-      while (done < len && (done == 0 || real.available() > 0))
-         done += realRead(b, off + done, Math.min(len - done, rateHelper.getBytesPerTick()));
+      while (done < len && (done == 0 || available() > 0 || (boring ? real.available() > 0 : false)))
+         done += realRead(b, off + done, Math.min(len - done, Math.max(1, rateHelper.getBytesPerTick())));
       return done;
    }
 
@@ -60,6 +63,7 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
    @Override
    public void close() throws IOException {
       real.close();
+      rateHelper.close();
    }
 
    @Override
@@ -87,6 +91,10 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
 
    void testSetIdleNotify(IdleNotify target) {
       rateHelper.testSetIdleNotify(target);
+   }
+
+   public void setBoring(boolean boring) {
+      this.boring = boring;
    }
 
 }

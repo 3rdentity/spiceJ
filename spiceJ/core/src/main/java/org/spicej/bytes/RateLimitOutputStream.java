@@ -3,6 +3,7 @@ package org.spicej.bytes;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.spicej.bytes.RateHelper.IdleNotify;
 import org.spicej.shapers.RateShaper;
 import org.spicej.ticks.TickSource;
 
@@ -12,11 +13,11 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
 
    private final RateHelper rateHelper;
 
-   public RateLimitOutputStream(OutputStream real, TickSource tickSource, int bytesPerTick) {
+   public RateLimitOutputStream(OutputStream real, TickSource tickSource, int bytesPerTick, int prescaler) {
       this.real = real;
       this.bytesPerTick = bytesPerTick;
 
-      this.rateHelper = new RateHelper(tickSource, bytesPerTick);
+      this.rateHelper = new RateHelper(tickSource, bytesPerTick, prescaler);
    }
 
    @Override
@@ -53,6 +54,7 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
    @Override
    public void close() throws IOException {
       real.close();
+      rateHelper.close();
    }
 
    @Override

@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.spicej.bytes.RateHelper.IdleNotify;
 import org.spicej.impl.SimulationTickSource;
 
 public class RateLimitOutputStreamTest {
@@ -20,7 +21,7 @@ public class RateLimitOutputStreamTest {
    @Before
    public void setUp() throws Exception {
       t = new SimulationTickSource();
-      sut = new RateLimitOutputStream(new ByteArrayOutputStream(250), t, 10);
+      sut = new RateLimitOutputStream(new ByteArrayOutputStream(250), t, 10, 1);
       sut.testEnableFailOnHang();
       sut.testSetIdleNotify(new IdleNotify() {
 

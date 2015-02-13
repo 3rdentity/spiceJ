@@ -9,6 +9,7 @@ import java.io.PipedOutputStream;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.spicej.bytes.RateHelper.IdleNotify;
 import org.spicej.impl.SimulationTickSource;
 
 public class RateLimitInputStreamTest {
@@ -26,7 +27,7 @@ public class RateLimitInputStreamTest {
       pos = new PipedOutputStream(pis);
 
       t = new SimulationTickSource();
-      sut = new RateLimitInputStream(pis, t, 10);
+      sut = new RateLimitInputStream(pis, t, 10, 1);
       sut.testEnableFailOnHang();
       sut.testSetIdleNotify(new IdleNotify() {
 
@@ -88,12 +89,28 @@ public class RateLimitInputStreamTest {
    @Test
    public void testInsufficient1extra() throws IOException {
       int rd = sut.read(buffer, 0, 13);
+      assertEquals(t0, t.getCurrentTick());
+      assertEquals(10, rd);
+   }
+
+   @Test
+   public void testInsufficient1extra_boring() throws IOException {
+      sut.setBoring(true);
+      int rd = sut.read(buffer, 0, 13);
       assertEquals(t0 + 1, t.getCurrentTick());
       assertEquals(13, rd);
    }
 
    @Test
    public void testInsufficient3extra() throws IOException {
+      int rd = sut.read(buffer, 0, 33);
+      assertEquals(t0, t.getCurrentTick());
+      assertEquals(10, rd);
+   }
+
+   @Test
+   public void testInsufficient3extra_boring() throws IOException {
+      sut.setBoring(true);
       int rd = sut.read(buffer, 0, 33);
       assertEquals(t0 + 3, t.getCurrentTick());
       assertEquals(33, rd);
@@ -102,12 +119,28 @@ public class RateLimitInputStreamTest {
    @Test
    public void testUnderrun0() throws IOException {
       int rd = sut.read(buffer, 0, 260);
+      assertEquals(t0, t.getCurrentTick());
+      assertEquals(10, rd);
+   }
+
+   @Test
+   public void testUnderrun0_boring() throws IOException {
+      sut.setBoring(true);
+      int rd = sut.read(buffer, 0, 260);
       assertEquals(t0 + 24, t.getCurrentTick());
       assertEquals(250, rd);
    }
 
    @Test
    public void testUnderrun1() throws IOException {
+      int rd = sut.read(buffer, 0, 251);
+      assertEquals(t0, t.getCurrentTick());
+      assertEquals(10, rd);
+   }
+
+   @Test
+   public void testUnderrun1_boring() throws IOException {
+      sut.setBoring(true);
       int rd = sut.read(buffer, 0, 251);
       assertEquals(t0 + 24, t.getCurrentTick());
       assertEquals(250, rd);

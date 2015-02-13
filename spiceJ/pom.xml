@@ -5,12 +5,13 @@
   <artifactId>spiceJ</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-  <name>${SpiceJ}</name>
+  <name>${project.friendly-name}</name>
 
   <packaging>pom</packaging>
 
   <modules>
-  <module>core</module>
+    <module>core</module>
+    <module>proxy</module>
   </modules>
 
   <properties>

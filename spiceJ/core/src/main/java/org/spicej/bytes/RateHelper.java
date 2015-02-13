@@ -6,8 +6,12 @@ import org.spicej.impl.SleepWakeup;
 import org.spicej.ticks.TickListener;
 import org.spicej.ticks.TickSource;
 
-public class RateHelper {
+class RateHelper {
+   private final TickSource tickSource;
    private int bytesPerTick;
+   private final int prescaler;
+   
+   private final Listener listener;
 
    private AtomicInteger spent = new AtomicInteger();
    private SleepWakeup sleep = new SleepWakeup();
@@ -16,12 +20,18 @@ public class RateHelper {
    private boolean testFailOnHang;
    private IdleNotify testIdleNotify;
 
-   RateHelper(TickSource tickSource, int bytesPerTick) {
+   RateHelper(TickSource tickSource, int bytesPerTick, int prescaler) {
+      this.tickSource = tickSource;
       this.bytesPerTick = bytesPerTick;
+      this.prescaler = prescaler;
 
       timewiseAvailable = bytesPerTick;
 
-      tickSource.addListener(new Listener());
+      tickSource.addListener(listener = new Listener());
+   }
+   
+   public void close() {
+      tickSource.removeListener(listener);
    }
 
    public void setBytesPerTick(int bytesPerTick) {
@@ -71,16 +81,18 @@ public class RateHelper {
    private class Listener implements TickListener {
       @Override
       public void tick(long tick) {
-         int value;
-         while (true) {
-            int stored = spent.get();
-            if (stored > bytesPerTick && spent.compareAndSet(stored, value = (stored - bytesPerTick)))
-               break;
-            else if (spent.compareAndSet(stored, (value = 0)))
-               break;
+         if (prescaler <= 1 || tick % prescaler == 0) {
+            int value;
+            while (true) {
+               int stored = spent.get();
+               if (stored > bytesPerTick && spent.compareAndSet(stored, value = (stored - bytesPerTick)))
+                  break;
+               else if (spent.compareAndSet(stored, (value = 0)))
+                  break;
+            }
+            timewiseAvailable = (int) (bytesPerTick - value);
+            wakeup();
          }
-         timewiseAvailable = (int) (bytesPerTick - value);
-         wakeup();
       }
    }
 
@@ -106,6 +118,10 @@ public class RateHelper {
       spent.addAndGet(-len);
       timewiseAvailable += len;
       wakeup();
+   }
+
+   interface IdleNotify {
+      boolean idle();
    }
 
 }

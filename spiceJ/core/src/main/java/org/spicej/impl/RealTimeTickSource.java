@@ -5,8 +5,14 @@ public class RealTimeTickSource extends AbstractTimeSource {
 
    private MyTimer timer;
 
-   public RealTimeTickSource(int nanosecondsInterval) {
-      this.interval = nanosecondsInterval;
+   public RealTimeTickSource(int nanoSecondsPerTick) {
+      this(nanoSecondsPerTick, true);
+   }
+
+   public RealTimeTickSource(int nanoSecondsPerTick, boolean start) {
+      this.interval = nanoSecondsPerTick;
+      if (start)
+         start();
    }
 
    @Override

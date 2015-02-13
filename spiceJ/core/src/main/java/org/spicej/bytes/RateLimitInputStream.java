@@ -9,20 +9,17 @@ import org.spicej.ticks.TickSource;
 public class RateLimitInputStream extends InputStream implements RateShaper {
    private final InputStream real;
 
-   private int bytesPerTick;
-
    private final RateHelper rateHelper;
 
    public RateLimitInputStream(InputStream real, TickSource tickSource, int bytesPerTick) {
       this.real = real;
-      this.bytesPerTick = bytesPerTick;
 
       this.rateHelper = new RateHelper(tickSource, bytesPerTick);
    }
 
    @Override
    public void setBytesPerTick(int bytesPerTick) {
-      this.bytesPerTick = bytesPerTick;
+      rateHelper.setBytesPerTick(bytesPerTick);
    }
 
    @Override
@@ -36,7 +33,7 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
    public int read(byte[] b, int off, int len) throws IOException {
       int done = 0;
       while (done < len && (done == 0 || real.available() > 0))
-         done += realRead(b, off + done, Math.min(len - done, bytesPerTick));
+         done += realRead(b, off + done, Math.min(len - done, rateHelper.getBytesPerTick()));
       return done;
    }
 

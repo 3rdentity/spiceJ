@@ -7,7 +7,7 @@ import org.spicej.ticks.TickListener;
 import org.spicej.ticks.TickSource;
 
 public class RateHelper {
-   private final int bytesPerTick;
+   private int bytesPerTick;
 
    private AtomicInteger spent = new AtomicInteger();
    private SleepWakeup sleep = new SleepWakeup();
@@ -22,6 +22,15 @@ public class RateHelper {
       timewiseAvailable = bytesPerTick;
 
       tickSource.addListener(new Listener());
+   }
+
+   public void setBytesPerTick(int bytesPerTick) {
+      this.bytesPerTick = bytesPerTick;
+      timewiseAvailable = (int) (bytesPerTick - spent.get());
+   }
+
+   public int getBytesPerTick() {
+      return bytesPerTick;
    }
 
    public void takeOne() {

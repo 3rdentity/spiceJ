@@ -1,5 +1,14 @@
 package org.spicej.shapers;
 
+/**
+ * An interface for byte rate shapers.
+ */
 public interface RateShaper {
-   void setBytesPerTick(int bytesPerTick);
+
+   /**
+    * Sets a new byte rate (after prescaling).
+    * 
+    * @param byteRate
+    */
+   void setByteRate(int byteRate);
 }

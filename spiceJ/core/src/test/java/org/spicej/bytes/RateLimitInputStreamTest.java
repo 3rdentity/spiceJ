@@ -197,13 +197,13 @@ public class RateLimitInputStreamTest {
       assertEquals(3, sut.read(buffer, 0, 3));
       assertEquals(7, sut.available());
       
-      sut.setBytesPerTick(8);
+      sut.setByteRate(8);
       assertEquals(5, sut.available());
       
-      sut.setBytesPerTick(5);
+      sut.setByteRate(5);
       assertEquals(2, sut.available());
       
-      sut.setBytesPerTick(1); // -2
+      sut.setByteRate(1); // -2
       assertEquals(0, sut.available());
       
       t.advance(); // -1
@@ -218,12 +218,12 @@ public class RateLimitInputStreamTest {
       t.advance();
       assertEquals(1, sut.available());
       
-      sut.setBytesPerTick(10);
+      sut.setByteRate(10);
       
       assertEquals(3, sut.read(buffer, 0, 3));
       assertEquals(7, sut.available());
       
-      sut.setBytesPerTick(14);
+      sut.setByteRate(14);
       assertEquals(11, sut.available());
    }
 }

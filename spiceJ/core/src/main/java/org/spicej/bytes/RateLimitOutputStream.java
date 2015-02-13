@@ -1,27 +1,36 @@
 package org.spicej.bytes;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.spicej.bytes.RateHelper.IdleNotify;
 import org.spicej.shapers.RateShaper;
 import org.spicej.ticks.TickSource;
 
+/**
+ * Provides an {@link OutputStream} with a limited rate of bytes.
+ */
 public class RateLimitOutputStream extends OutputStream implements RateShaper {
    private final OutputStream real;
    private int bytesPerTick;
 
    private final RateHelper rateHelper;
 
-   public RateLimitOutputStream(OutputStream real, TickSource tickSource, int bytesPerTick, int prescaler) {
+   /**
+    * Constructs a byte-rate-limited {@link OutputStream}. See
+    * {@link RateLimitInputStream} for a description of the rate parameters
+    * (byteRate and prescale).
+    */
+   public RateLimitOutputStream(OutputStream real, TickSource tickSource, int byteRate, int prescale) {
       this.real = real;
-      this.bytesPerTick = bytesPerTick;
+      this.bytesPerTick = byteRate;
 
-      this.rateHelper = new RateHelper(tickSource, bytesPerTick, prescaler);
+      this.rateHelper = new RateHelper(tickSource, byteRate, prescale);
    }
 
    @Override
-   public void setBytesPerTick(int bytesPerTick) {
+   public void setByteRate(int bytesPerTick) {
       this.bytesPerTick = bytesPerTick;
    }
 

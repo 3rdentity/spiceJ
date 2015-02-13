@@ -6,7 +6,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.spicej.ticks.TickSource;
 import org.spicej.ticks.TickListener;
 
-public abstract class AbstractTimeSource implements TickSource {
+/**
+ * An abstract tick source keeping track of its listeners.
+ */
+public abstract class AbstractTickSource implements TickSource {
    private final Queue<TickListener> listeners = new ConcurrentLinkedQueue<>();
 
    @Override
@@ -19,6 +22,11 @@ public abstract class AbstractTimeSource implements TickSource {
       listeners.remove(listener);
    }
 
+   /**
+    * Distributes a tick event to its listeners.
+    * 
+    * @param tick
+    */
    protected void doTick(long tick) {
       for (TickListener listener : listeners)
          listener.tick(tick);

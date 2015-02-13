@@ -1,27 +1,26 @@
 package org.spicej.bytes;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.spicej.impl.SleepWakeup;
 import org.spicej.ticks.TickListener;
 import org.spicej.ticks.TickSource;
 
-public class RateLimitInputStream extends InputStream {
+public class RateLimitOutputStream extends OutputStream {
 
-   private final InputStream real;
+   private final OutputStream real;
    private final int num;
 
    private boolean testFailOnHang;
    private IdleNotify testIdleNotify;
 
    private AtomicInteger spent = new AtomicInteger();
-   private int timewiseAvailable = 0;
 
    private SleepWakeup sleep = new SleepWakeup();
 
-   public RateLimitInputStream(InputStream real, TickSource tickSource, int bytesPerTick) {
+   public RateLimitOutputStream(OutputStream real, TickSource tickSource, int bytesPerTick) {
       this.real = real;
       this.num = bytesPerTick;
 
@@ -29,7 +28,7 @@ public class RateLimitInputStream extends InputStream {
    }
 
    @Override
-   public int read() throws IOException {
+   public void write(int b) throws IOException {
       while (true) {
          int stored = spent.get();
          if (stored >= num)
@@ -38,46 +37,34 @@ public class RateLimitInputStream extends InputStream {
             break;
       }
 
-      return real.read();
+      real.write(b);
    }
-
+   
    @Override
-   public int read(byte[] b, int off, int len) throws IOException {
+   public void write(byte[] b, int off, int len) throws IOException {
       int done = 0;
-      while (done < len && (done == 0 || real.available() > 0))
-         done += realRead(b, off + done, Math.min(len - done, num));
-      return done;
+      while (done < len)
+         done += realWrite(b, off + done, Math.min(len - done, num));
    }
 
-   // len <= num
-   private int realRead(byte[] b, int off, int len) throws IOException {
-      int lenToRead;
+   private int realWrite(byte[] b, int off, int len) throws IOException {
+      int lenToWrite;
       while (true) {
          int stored = spent.get();
-         lenToRead = Math.min(len, num - stored);
+         lenToWrite = Math.min(len, num - stored);
          if (stored >= num)
             sleep();
-         else if (spent.compareAndSet(stored, stored + lenToRead))
+         else if (spent.compareAndSet(stored, stored + lenToWrite))
             break;
       }
 
-      int rd = real.read(b, off, lenToRead);
-      if (rd != len) {
-         spent.addAndGet(-rd);
-         wakeup();
-      }
-      timewiseAvailable -= rd;
-      return rd;
+      real.write(b, off, lenToWrite);
+      return lenToWrite;
    }
 
    @Override
-   public int available() throws IOException {
-      return Math.max(0, Math.min(real.available(), timewiseAvailable));
-   }
-
-   @Override
-   public int read(byte[] b) throws IOException {
-      return read(b, 0, b.length);
+   public void write(byte[] b) throws IOException {
+      write(b, 0, b.length);
    }
 
    @Override
@@ -86,18 +73,8 @@ public class RateLimitInputStream extends InputStream {
    }
 
    @Override
-   public synchronized void mark(int readlimit) {
-      real.mark(readlimit);
-   }
-
-   @Override
-   public boolean markSupported() {
-      return real.markSupported();
-   }
-
-   @Override
-   public synchronized void reset() throws IOException {
-      real.reset();
+   public void flush() throws IOException {
+      real.flush();
    }
 
    private void wakeup() {
@@ -125,7 +102,6 @@ public class RateLimitInputStream extends InputStream {
             else if (spent.compareAndSet(stored, 0))
                break;
          }
-         timewiseAvailable = (int) (num - stored);
          wakeup();
       }
    }

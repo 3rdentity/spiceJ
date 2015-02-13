@@ -1,6 +1,3 @@
-#Work in Progress
-**Please note**: spiceJ is under **heavy development** at the moment. Some parts of this readme describe present features, some describe features planned for the near future.
-
 # spiceJ
 
 spiceJ is a network traffic shaping tool written in Java.
@@ -8,11 +5,11 @@ spiceJ is a network traffic shaping tool written in Java.
 Its goal is the simulation of a few network properties:
 
 1. Limited Bandwidth
-1. Additional Latency
+1. Additional Latency (**not yet implemented**)
 
-All properties will allow for jitter, and will be supported dynamically (ie. can change over simulation time).
+All properties allow for jitter (**not yet implemented**), and are dynamic (ie. can change during simulation time).
 
-spiceJ aims to support reproducible outcomes, meaning that a simulation with random elements like jitter will use a mechanism to persist all non-deterministic data and make the outcome purely deterministic.
+spiceJ aims to support reproducible outcomes, meaning that a simulation is purely deterministic and contains no random elements. To achieve completely reproducible simulation, use `SimulationTickSource` instead of `RealTimeTickSource`.
 
 spiceJ consists of Java Proxy Objects of InputStream and OutputStream, hiding the original stream and adding the desired properties. Furthermore, spiceJ offers wrappers for creating a transparent (stand-alone) TCP proxy, allowing users to simulate network shaping using any client application.
 
@@ -29,6 +26,8 @@ is enough to compile, test and package all source code.
 You can use spiceJ either by including it into your project and using its classes, or in standalone mode.
 
 ### As a library
+
+To use spiceJ as a library, take a look at the `Streams` class, it contains helper methods for using spiceJ's main features. It is also a good entry point for exploring the javadoc present in code. All public API members are documented in-code.
 
 ### Stand-Alone 
 

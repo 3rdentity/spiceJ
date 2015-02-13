@@ -17,6 +17,11 @@ public class TCP {
          System.exit(1);
          return;
       }
+      
+      if(commandLine.help) {
+         commander.usage();
+         return;
+      }
 
       if (commandLine.rate != null) {
          if (commandLine.rateReceive != null) {

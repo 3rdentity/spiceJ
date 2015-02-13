@@ -20,4 +20,7 @@ public class CommandLine {
 
    @Parameter(names = { "--rate", "-r" }, description = "The byte rate to allow in both directions (can't be used with -a or -b)")
    public Integer rate;
+
+   @Parameter(names = { "--help", "-?" }, description = "Prints usage.")
+   public boolean help;
 }

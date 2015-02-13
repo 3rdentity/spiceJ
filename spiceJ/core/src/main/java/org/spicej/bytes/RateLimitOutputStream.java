@@ -1,7 +1,6 @@
 package org.spicej.bytes;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.spicej.bytes.RateHelper.IdleNotify;

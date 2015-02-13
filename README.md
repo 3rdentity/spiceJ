@@ -14,15 +14,21 @@ All properties will allow for jitter, and will be supported dynamically (ie. can
 
 spiceJ aims to support reproducible outcomes, meaning that a simulation with random elements like jitter will use a mechanism to persist all non-deterministic data and make the outcome purely deterministic.
 
-spiceJ consists of Java Proxy Objects of InputStream and OutputStream, hiding the original stream and adding the desired properties. Furthermore, spiceJ offers wrappers for creating a transparent TCP proxy, allowing users to simulate network shaping using any client application.
+spiceJ consists of Java Proxy Objects of InputStream and OutputStream, hiding the original stream and adding the desired properties. Furthermore, spiceJ offers wrappers for creating a transparent (standalone) TCP proxy, allowing users to simulate network shaping using any client application.
 
-## Installation
+## Build
 
-TODO
+The project is using maven as a built tool, so simply running
+
+``` mvn package ```
+
+is enough to compile, test and package all source code.
 
 ## Usage
 
-TODO
+Currently, the only way to use spiceJ is to start it in (standalone) TCP proxy mode:
+
+``` java -jar proxy-0.0.1-SNAPSHOT-jar-with-dependencies.jar -l <local-port> -h <remote-host> -p <remote-port> -r <bytes-per-second> ```
 
 ## Contributing
 

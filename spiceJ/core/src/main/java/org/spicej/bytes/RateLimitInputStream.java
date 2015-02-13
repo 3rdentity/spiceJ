@@ -3,11 +3,13 @@ package org.spicej.bytes;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.spicej.shapers.RateShaper;
 import org.spicej.ticks.TickSource;
 
-public class RateLimitInputStream extends InputStream {
+public class RateLimitInputStream extends InputStream implements RateShaper {
    private final InputStream real;
-   private final int bytesPerTick;
+
+   private int bytesPerTick;
 
    private final RateHelper rateHelper;
 
@@ -16,6 +18,11 @@ public class RateLimitInputStream extends InputStream {
       this.bytesPerTick = bytesPerTick;
 
       this.rateHelper = new RateHelper(tickSource, bytesPerTick);
+   }
+
+   @Override
+   public void setBytesPerTick(int bytesPerTick) {
+      this.bytesPerTick = bytesPerTick;
    }
 
    @Override

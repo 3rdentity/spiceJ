@@ -3,19 +3,25 @@ package org.spicej.bytes;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.spicej.shapers.RateShaper;
 import org.spicej.ticks.TickSource;
 
-public class RateLimitOutputStream extends OutputStream {
+public class RateLimitOutputStream extends OutputStream implements RateShaper {
    private final OutputStream real;
-   private final int num;
+   private int bytesPerTick;
 
    private final RateHelper rateHelper;
 
    public RateLimitOutputStream(OutputStream real, TickSource tickSource, int bytesPerTick) {
       this.real = real;
-      this.num = bytesPerTick;
+      this.bytesPerTick = bytesPerTick;
 
       this.rateHelper = new RateHelper(tickSource, bytesPerTick);
+   }
+
+   @Override
+   public void setBytesPerTick(int bytesPerTick) {
+      this.bytesPerTick = bytesPerTick;
    }
 
    @Override
@@ -28,7 +34,7 @@ public class RateLimitOutputStream extends OutputStream {
    public void write(byte[] b, int off, int len) throws IOException {
       int done = 0;
       while (done < len)
-         done += realWrite(b, off + done, Math.min(len - done, num));
+         done += realWrite(b, off + done, Math.min(len - done, bytesPerTick));
    }
 
    // len <= num

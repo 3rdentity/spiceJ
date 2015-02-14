@@ -26,14 +26,14 @@ public class Streams {
     *           (see
     *           {@link RateLimitInputStream#RateLimitInputStream(InputStream, TickSource, int, int)}
     *           )
-    * @param prescaler
+    * @param prescale
     *           (see
     *           {@link RateLimitInputStream#RateLimitInputStream(InputStream, TickSource, int, int)}
     *           )
     * @return
     */
-   public static RateLimitInputStream limitRate(InputStream base, TickSource tickSource, int bytesPerTick, int prescaler) {
-      return new RateLimitInputStream(base, tickSource, bytesPerTick, prescaler);
+   public static RateLimitInputStream limitRate(InputStream base, TickSource tickSource, int bytesPerTick, int prescale) {
+      return new RateLimitInputStream(base, tickSource, bytesPerTick, prescale);
    }
 
    /**

@@ -5,13 +5,14 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.spicej.RateCalculator.Result;
 import org.spicej.impl.RealTimeTickSource;
 import org.spicej.ticks.TickSource;
 
 public class SocketProxy implements Runnable {
    private final int remotePort;
    private final String remoteHost;
-   private final Integer rateUp, rateDown;
+   private final Float rateUp, rateDown;
 
    private ServerSocket listener;
 
@@ -25,7 +26,7 @@ public class SocketProxy implements Runnable {
 
    private static TickSource tickSource = new RealTimeTickSource(TICK_IN_NS, true);
 
-   public SocketProxy(int localPort, String remoteHost, int remotePort, Integer rateUp, Integer rateDown) throws IOException {
+   public SocketProxy(int localPort, String remoteHost, int remotePort, Float rateUp, Float rateDown) throws IOException {
       this.remoteHost = remoteHost;
       this.remotePort = remotePort;
       this.rateUp = rateUp;
@@ -95,14 +96,11 @@ public class SocketProxy implements Runnable {
 
    }
 
-   private static InputStream rate(InputStream inputStream, Integer rate) {
+   private static InputStream rate(InputStream inputStream, Float rate) {
       if (rate == null)
          return inputStream;
 
-      int prescaler = rate >= THRESHOLD ? PRESCALER_1 : PRESCALER_2;
-
-      long effRate = (long) rate * S_IN_TICKS * prescaler / TICK_IN_NS;
-
-      return Streams.limitRate(inputStream, tickSource, (int) effRate, prescaler);
+      Result calculation = RateCalculator.calculate(rate);
+      return Streams.limitRate(inputStream, new RealTimeTickSource(calculation.getTickNanosecondInterval(), true), calculation.getBytesPerTick(), calculation.getPrescale());
    }
 }

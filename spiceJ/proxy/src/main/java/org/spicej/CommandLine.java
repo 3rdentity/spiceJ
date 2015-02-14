@@ -13,13 +13,13 @@ public class CommandLine {
    public int remotePort;
 
    @Parameter(names = { "--rate-send", "-a" }, description = "The byte rate to allow towards the remote host")
-   public Integer rateSend;
+   public Float rateSend;
 
    @Parameter(names = { "--rate-receive", "-b" }, description = "The byte rate to allow from the remote host")
-   public Integer rateReceive;
+   public Float rateReceive;
 
    @Parameter(names = { "--rate", "-r" }, description = "The byte rate to allow in both directions (can't be used with -a or -b)")
-   public Integer rate;
+   public Float rate;
 
    @Parameter(names = { "--help", "-?" }, description = "Prints usage.")
    public boolean help;

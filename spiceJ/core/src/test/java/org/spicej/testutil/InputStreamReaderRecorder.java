@@ -37,8 +37,6 @@ public class InputStreamReaderRecorder {
       Thread t = new Thread(new Runner(sut, target, blockSize));
       t.setDaemon(true);
       t.start();
-
-      SleepWakeup.sleep(10);
    }
 
    public void waitFor() {

@@ -81,7 +81,7 @@ class RateHelper {
          int stored = spent.get();
          if (stored >= thingsPerTick)
             sleep();
-         if (spent.compareAndSet(stored, stored + 1))
+         else if (spent.compareAndSet(stored, stored + 1))
             break;
       }
    }
@@ -140,7 +140,7 @@ class RateHelper {
    /**
     * Testability method: enables that any call to {@link #take(int)} or
     * {@link #takeOne()} fails if waiting (blocking) would occur. This is
-    * necessary for unit tests.
+    * necessary to prevent blocking in unit tests.
     */
    void testEnableFailOnHang() {
       testFailOnHang = true;
@@ -148,8 +148,7 @@ class RateHelper {
 
    /**
     * Testability method: disables that any call to {@link #take(int)} or
-    * {@link #takeOne()} fails if waiting (blocking) would occur. This is
-    * necessary for unit tests.
+    * {@link #takeOne()} fails if waiting (blocking) would occur.
     */
    void testDisableFailOnHang() {
       testFailOnHang = false;

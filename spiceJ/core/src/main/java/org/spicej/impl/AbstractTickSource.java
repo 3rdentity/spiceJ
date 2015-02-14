@@ -7,9 +7,13 @@ import org.spicej.ticks.TickSource;
 import org.spicej.ticks.TickListener;
 
 /**
- * An abstract tick source keeping track of its listeners.
+ * An abstract tick source keeping track of its listeners. The tick source is in
+ * a non-initialized state until the first call to {@link #doTick(long)}.
  */
 public abstract class AbstractTickSource implements TickSource {
+   private long tick = -1;
+
+   private final Queue<TickListener> preListeners = new ConcurrentLinkedQueue<>();
    private final Queue<TickListener> listeners = new ConcurrentLinkedQueue<>();
 
    @Override
@@ -27,8 +31,21 @@ public abstract class AbstractTickSource implements TickSource {
     * 
     * @param tick
     */
-   protected void doTick(long tick) {
+   protected void doTick() {
+      for (TickListener listener : preListeners)
+         listener.tick(tick + 1);
+      tick++;
       for (TickListener listener : listeners)
          listener.tick(tick);
+   }
+
+   @Override
+   public long getCurrentTick() {
+      return tick;
+   }
+
+   @Override
+   public void reset() {
+      tick = 0;
    }
 }

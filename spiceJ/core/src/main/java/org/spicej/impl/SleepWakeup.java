@@ -28,4 +28,19 @@ public class SleepWakeup {
          }
       }
    }
+
+   /**
+    * Sleeps for the provided amount of milliseconds, ignoring thread
+    * interrupts.
+    * 
+    * @param ms
+    */
+   public static void sleep(int ms) {
+      long deadline = System.currentTimeMillis() + ms;
+      while (System.currentTimeMillis() < deadline) {
+         try {
+            Thread.sleep(Math.max(1, (deadline - System.currentTimeMillis()) / 2));
+         } catch (InterruptedException _) {}
+      }
+   }
 }

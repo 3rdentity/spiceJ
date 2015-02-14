@@ -81,7 +81,6 @@ public class RealTimeTickSource extends AbstractTickSource {
 
       private final Object lock = new Object();
 
-      private int tick = 0;
       private boolean cancel = false;
 
       @Override
@@ -90,7 +89,7 @@ public class RealTimeTickSource extends AbstractTickSource {
 
          while (!cancel) {
             if (System.nanoTime() >= nextWakeup) {
-               RealTimeTickSource.super.doTick(tick++);
+               RealTimeTickSource.super.doTick();
                nextWakeup = nextWakeup + interval;
             }
 

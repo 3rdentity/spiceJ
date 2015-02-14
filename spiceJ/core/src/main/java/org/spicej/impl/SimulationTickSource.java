@@ -6,25 +6,10 @@ package org.spicej.impl;
  */
 public class SimulationTickSource extends AbstractTickSource {
 
-   private long tick = 0;
-
    /**
     * Generates a tick and advances the tick counter by 1.
     */
    public void advance() {
-      doTick(tick++);
+      doTick();
    }
-
-   /**
-    * Returns the current tick.
-    */
-   public long getCurrentTick() {
-      return tick;
-   }
-
-   @Override
-   public void reset() {
-      tick = 0;
-   }
-
 }

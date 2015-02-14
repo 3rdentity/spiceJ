@@ -15,6 +15,7 @@ public class SimulationTickSourceTest {
    @Before
    public void setUp() {
       sut = new SimulationTickSource();
+      sut.advance();
    }
 
    @Test
@@ -36,20 +37,20 @@ public class SimulationTickSourceTest {
       sut.advance();
       assertEquals(1, sut.getCurrentTick());
 
-      verify(listenerA).tick(0);
+      verify(listenerA).tick(1);
 
       sut.advance();
 
       assertEquals(2, sut.getCurrentTick());
-      verify(listenerA).tick(1);
+      verify(listenerA).tick(2);
       
       sut.addListener(listenerB);
       
       sut.advance();
 
       assertEquals(3, sut.getCurrentTick());
-      verify(listenerA).tick(2);
-      verify(listenerB).tick(2);
+      verify(listenerA).tick(3);
+      verify(listenerB).tick(3);
    }
 
 }

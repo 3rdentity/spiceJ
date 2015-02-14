@@ -22,4 +22,9 @@ public interface TickSource {
     * @param listener
     */
    void removeListener(TickListener listener);
+
+   /**
+    * Returns the current tick.
+    */
+   long getCurrentTick();
 }

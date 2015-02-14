@@ -57,9 +57,11 @@ class StreamGobbler implements Runnable {
    }
 
    public void close() {
+      cancel = true;
       try {
          thread.interrupt();
-      } catch (Exception ignore) {}
+         waitFor();
+      } catch (Throwable ignore) {}
 
       try {
          is.close();

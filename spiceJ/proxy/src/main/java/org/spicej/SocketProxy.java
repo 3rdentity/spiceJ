@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.spicej.RateCalculator.Result;
 import org.spicej.impl.RealTimeTickSource;
-import org.spicej.ticks.TickSource;
 
 public class SocketProxy implements Runnable {
    private final int remotePort;
@@ -15,16 +15,6 @@ public class SocketProxy implements Runnable {
    private final Float rateUp, rateDown;
 
    private ServerSocket listener;
-
-   private static final int TICK_IN_NS = 1000000; // 1 ms
-   private static final int S_IN_TICKS = 1000; // 1000 ticks = 1000 ms = 1 s
-
-   private static final int PRESCALER_1 = 500;
-   private static final int PRESCALER_2 = 1000;
-
-   private static final int THRESHOLD = 10000;
-
-   private static TickSource tickSource = new RealTimeTickSource(TICK_IN_NS, true);
 
    public SocketProxy(int localPort, String remoteHost, int remotePort, Float rateUp, Float rateDown) throws IOException {
       this.remoteHost = remoteHost;
@@ -82,9 +72,17 @@ public class SocketProxy implements Runnable {
 
             a.waitFor();
             b.waitFor();
+         } catch (SocketException ignore) {
+            /*
+             * unfortunately we can't distinguish between "socket closed" and other exceptions.
+             * "socket closed" occurs because we have to close the socket while the other gobbler is
+             * still running
+             */
          } catch (Throwable t) {
             t.printStackTrace();
          } finally {
+            a.close();
+            b.close();
             try {
                client.close();
             } catch (Exception ignore) {}

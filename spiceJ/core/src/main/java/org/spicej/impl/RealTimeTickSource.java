@@ -1,5 +1,7 @@
 package org.spicej.impl;
 
+import org.spicej.ticks.TickListener;
+
 /**
  * A tick source bound to real time. Any tick interval can be specified in
  * nanoseconds, but obviously the platform poses natural bounds for this
@@ -13,9 +15,14 @@ package org.spicej.impl;
  * until the next tick, one or more subsequent ticks will be fired immediately.
  * 
  * Ticks start at 0 and are processed in single-threaded mode.
+ * 
+ * If the last tick listener has been removed from this source, it shuts itself
+ * down via {@link #stop()}, if it's not set to keepAlive mode using
+ * {@link #setKeepAlive(boolean)}.
  */
 public class RealTimeTickSource extends AbstractTickSource {
    private final int interval;
+   private boolean keepAlive = false;
 
    private MyTimer timer;
 
@@ -45,9 +52,34 @@ public class RealTimeTickSource extends AbstractTickSource {
          start();
    }
 
+   /**
+    * Sets the keepAlive mode of this tick source. If keepAlive is false
+    * (default), the source shuts itself down via {@link #stop()} upon the
+    * removal of the last tick listener. If keepAlive is true, the source stays
+    * active.
+    * 
+    * @param keepAlive
+    */
+   public void setKeepAlive(boolean keepAlive) {
+      this.keepAlive = keepAlive;
+   }
+
    @Override
    public void reset() {
       stop();
+   }
+
+   /**
+    * If the last tick listener has been removed from this source, it shuts
+    * itself down via {@link #stop()}, if it's not set to keepAlive mode using
+    * {@link #setKeepAlive(boolean)}.
+    */
+   @Override
+   public void removeListener(TickListener listener) {
+      super.removeListener(listener);
+
+      if (listeners.isEmpty() && !keepAlive)
+         stop();
    }
 
    /**

@@ -14,7 +14,6 @@ public class InputStreamReaderRecorder {
    private final SimulationTickSource t;
    private long[] recording;
    private boolean running = true;
-   private long finishedTick = 0;
 
    private final SleepWakeup sleepFinish = new SleepWakeup();
 

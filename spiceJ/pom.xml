@@ -23,9 +23,21 @@
     <project.friendly-name>SpiceJ</project.friendly-name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    
+
     <scm-url>scm:git:git@github.com:michael-borkowski/spiceJ.git</scm-url>
   </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <goals>install</goals>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <scm>
     <connection>${scm-url}</connection>

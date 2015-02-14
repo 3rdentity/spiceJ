@@ -9,6 +9,12 @@ import java.net.SocketException;
 import org.spicej.RateCalculator.Result;
 import org.spicej.impl.RealTimeTickSource;
 
+/**
+ * A proxy provider for TCP connections allowing for upstream and downstream
+ * rate limitation. This proxy listens for connections on a local port and
+ * forwards data to and from a connection to a remote port upon local
+ * connection. Upstream and downstream rate limitations are possible.
+ */
 public class SocketProxy implements Runnable {
    private final int remotePort;
    private final String remoteHost;
@@ -16,6 +22,23 @@ public class SocketProxy implements Runnable {
 
    private ServerSocket listener;
 
+   /**
+    * Creates a proxy and binds to the local port.
+    * 
+    * @param localPort
+    *           the local port to listen on
+    * @param remoteHost
+    *           the remote host to connect to
+    * @param remotePort
+    *           the remote port to connect to
+    * @param rateUp
+    *           the upstream rate limitation to establish, or <code>null</code>
+    *           for no limit
+    * @param rateDown
+    *           the downstream rate limitation to establish, or
+    *           <code>null</code> for no limit
+    * @throws IOException
+    */
    public SocketProxy(int localPort, String remoteHost, int remotePort, Float rateUp, Float rateDown) throws IOException {
       this.remoteHost = remoteHost;
       this.remotePort = remotePort;
@@ -25,6 +48,15 @@ public class SocketProxy implements Runnable {
       listener = new ServerSocket(localPort);
    }
 
+   private static InputStream rate(InputStream inputStream, Float rate) {
+      if (rate == null)
+         return inputStream;
+
+      Result calculation = RateCalculator.calculate(rate);
+      return Streams.limitRate(inputStream, new RealTimeTickSource(calculation.getTickNanosecondInterval(), true), calculation.getBytesPerTick(), calculation.getPrescale());
+   }
+
+   @Override
    public void run() {
       while (true) {
          try {
@@ -47,7 +79,6 @@ public class SocketProxy implements Runnable {
    }
 
    class Connector implements Runnable {
-
       private final Socket client, server;
 
       public Connector(Socket client, Socket server) {
@@ -92,13 +123,5 @@ public class SocketProxy implements Runnable {
          }
       }
 
-   }
-
-   private static InputStream rate(InputStream inputStream, Float rate) {
-      if (rate == null)
-         return inputStream;
-
-      Result calculation = RateCalculator.calculate(rate);
-      return Streams.limitRate(inputStream, new RealTimeTickSource(calculation.getTickNanosecondInterval(), true), calculation.getBytesPerTick(), calculation.getPrescale());
    }
 }

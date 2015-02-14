@@ -3,7 +3,11 @@ package org.spicej;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-class StreamGobbler implements Runnable {
+/**
+ * A stream gobbler, copying data from an {@link InputStream} to an
+ * {@link OutputStream}.
+ */
+public class StreamGobbler implements Runnable {
    private final InputStream is;
    private final OutputStream os;
 
@@ -41,6 +45,12 @@ class StreamGobbler implements Runnable {
       }
    }
 
+   /**
+    * Waits until the gobbler finished. If the gobbler encountered any
+    * exception, it is thrown from this method.
+    * 
+    * @throws Throwable
+    */
    public void waitFor() throws Throwable {
       while (!finished) {
          try {
@@ -56,6 +66,9 @@ class StreamGobbler implements Runnable {
          throw t;
    }
 
+   /**
+    * Interrupts the gobbler and closes its streams.
+    */
    public void close() {
       cancel = true;
       try {

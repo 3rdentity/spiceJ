@@ -11,6 +11,8 @@ import org.spicej.RateCalculator.Result;
 
 public class RateCalculatorTest {
 
+   public static final int SCALE = 60;
+
    private static final double MAX_ERROR = 0.01;
 
    @Before
@@ -19,7 +21,13 @@ public class RateCalculatorTest {
    @Test
    public void testMinimumByterate() {
       // one of the lowest byterates possible to generate with our data model
-      test(0.00000000094F);
+      test(RateCalculator.MIN_RATE);
+   }
+
+   @Test
+   public void testMaximumByterate() {
+      // one of the highest byterates possible to generate with our data model
+      test(RateCalculator.MAX_RATE);
    }
 
    @Test
@@ -78,22 +86,12 @@ public class RateCalculatorTest {
          test((float) r * 1000000000);
    }
 
-   @Test
-   public void test() {
-      test(1000);
-   }
-
-   @Test
-   public void testMaximumByterate() {
-      test(340092346638528859811704183484516925440F);
-   }
-
    private void test(float rate) {
       Result r = RateCalculator.calculate(rate);
       BigDecimal actualRate_ = new BigDecimal(RateCalculator.NS_PER_S);
       actualRate_ = actualRate_.multiply(new BigDecimal(r.getBytesPerTick()));
-      actualRate_ = actualRate_.divide(new BigDecimal(r.getPrescale()), RateCalculator.SCALE, RoundingMode.HALF_UP);
-      actualRate_ = actualRate_.divide(new BigDecimal(r.getTickNanosecondInterval()), RateCalculator.SCALE, RoundingMode.HALF_UP);
+      actualRate_ = actualRate_.divide(new BigDecimal(r.getPrescale()), SCALE, RoundingMode.HALF_UP);
+      actualRate_ = actualRate_.divide(new BigDecimal(r.getTickNanosecondInterval()), SCALE, RoundingMode.HALF_UP);
 
       if (actualRate_.compareTo(new BigDecimal(0)) == 0)
          fail("rate is 0");

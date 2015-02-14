@@ -5,19 +5,21 @@ package org.spicej.ticks;
  */
 public interface TickSource {
    /**
-    * Resets the tick source to its initial state.
+    * Resets the tick source to its initial state. The exact outcome is not
+    * defined and may be either inside the first tick or in an uninitialized
+    * tick state.
     */
    void reset();
 
    /**
-    * Adds a listener to fire tick events to.
+    * Adds a listener to fire TICK events to.
     * 
     * @param listener
     */
    void addListener(TickListener listener);
 
    /**
-    * Removes a listener.
+    * Removes a TICK listener.
     * 
     * @param listener
     */

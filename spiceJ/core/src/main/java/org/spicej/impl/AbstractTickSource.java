@@ -13,7 +13,6 @@ import org.spicej.ticks.TickListener;
 public abstract class AbstractTickSource implements TickSource {
    private long tick = -1;
 
-   private final Queue<TickListener> preListeners = new ConcurrentLinkedQueue<>();
    private final Queue<TickListener> listeners = new ConcurrentLinkedQueue<>();
 
    @Override
@@ -32,8 +31,6 @@ public abstract class AbstractTickSource implements TickSource {
     * @param tick
     */
    protected void doTick() {
-      for (TickListener listener : preListeners)
-         listener.tick(tick + 1);
       tick++;
       for (TickListener listener : listeners)
          listener.tick(tick);
@@ -46,6 +43,6 @@ public abstract class AbstractTickSource implements TickSource {
 
    @Override
    public void reset() {
-      tick = 0;
+      tick = -1;
    }
 }

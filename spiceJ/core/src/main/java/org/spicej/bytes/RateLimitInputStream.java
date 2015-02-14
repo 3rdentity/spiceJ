@@ -20,8 +20,9 @@ import org.spicej.ticks.TickSource;
  * until all actually available bytes have been read, even if many ticks must be
  * waited for the data to become available according to the set rate.
  * 
- * In non-boring mode, the methods block only for data which can be read
- * immediately.
+ * In non-boring mode, the methods do not block and read only data which can be
+ * read immediately (except for the first byte which, according to the
+ * definition of {@link InputStream}, causes blocking for all read methods).
  * 
  * Streams are non-boring by default.
  * 
@@ -71,21 +72,6 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
       rateHelper.setThingsPerTick(bytesPerTick);
    }
 
-   @Override
-   public int read() throws IOException {
-      rateHelper.takeOne();
-
-      return real.read();
-   }
-
-   @Override
-   public int read(byte[] b, int off, int len) throws IOException {
-      int done = 0;
-      while (done < len && (done == 0 || available() > 0 || (boring ? real.available() > 0 : false)))
-         done += realRead(b, off + done, Math.min(len - done, Math.max(1, rateHelper.getBytesPerTick())));
-      return done;
-   }
-
    // len <= num
    private int realRead(byte[] b, int off, int len) throws IOException {
       int lenToRead = rateHelper.take(len);
@@ -96,14 +82,71 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
       return rd;
    }
 
+   /**
+    * Reads one byte from the stream. This method blocks if there is no byte
+    * available from the underlying {@link InputStream} or a rate block has been
+    * encountered, regardless of the stream's boring flag.
+    */
    @Override
-   public int available() throws IOException {
-      return Math.min(real.available(), rateHelper.getTimewiseAvailable());
+   public int read() throws IOException {
+      rateHelper.takeOne();
+
+      return real.read();
    }
 
+   /**
+    * This method complies with {@link InputStream#read(byte[], int, int)} and
+    * imposes stronger postconditions.
+    * 
+    * Reads up to <code>len</code> bytes from the stream. This method blocks for
+    * the first byte reagrdless of the stream's boring flag. For all subsequent
+    * bytes, the behavior depends on the boring flag:
+    * 
+    * <ul>
+    * <li>In boring mode, the stream blocks until all bytes actually available
+    * from the underlying InputStream (reported by
+    * {@link InputStream#available()}) have been read, even if this means
+    * waiting for the next tick.
+    * <li>In non-boring mode, the stream does not block for the first byte's
+    * subsequent bytes. This means that if a rate limitation is in place (ie.
+    * the rate has been reached for the current tick), this method does not
+    * attempt to read the bytes (the number of actually read bytes is returned
+    * conforming with {@link InputStream#read(byte[], int, int)}.
+    * <ul>
+    */
+   @Override
+   public int read(byte[] b, int off, int len) throws IOException {
+      int done = 0;
+      while (done < len && (done == 0 || available() > 0 || (boring && real.available() > 0)))
+         done += realRead(b, off + done, Math.min(len - done, Math.max(1, rateHelper.getBytesPerTick())));
+      return done;
+   }
+
+   /**
+    * Behaves the same as:
+    * 
+    * <pre>
+    * read(b, 0, b.length);
+    * </pre>
+    */
    @Override
    public int read(byte[] b) throws IOException {
       return read(b, 0, b.length);
+   }
+
+   /**
+    * This method complies with {@link InputStream#available()} and imposes
+    * stronger postconditions.
+    * 
+    * The returned value is the number of bytes available for immediate reading.
+    * If there is no rate limitation in place (ie. the rate has not been reached
+    * for the current tick), the {@link InputStream#available()} method of the
+    * underlying {@link InputStream} is called. If a rate limitation is in
+    * place, the number of bytes readable in the current tick is returned.
+    */
+   @Override
+   public int available() throws IOException {
+      return Math.min(real.available(), rateHelper.getTimewiseAvailable());
    }
 
    @Override

@@ -38,7 +38,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>org.spicej.TCP</mainClass>
+              <mainClass>org.spicej.ProxyMain</mainClass>
             </manifest>
           </archive>
         </configuration>

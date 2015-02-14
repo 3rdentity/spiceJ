@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
-public class TCP {
+public class ProxyMain {
    public static void main(String[] args) {
       CommandLine commandLine = new CommandLine();
       JCommander commander = new JCommander(commandLine);

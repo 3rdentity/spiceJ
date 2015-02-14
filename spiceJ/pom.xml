@@ -23,5 +23,13 @@
     <project.friendly-name>SpiceJ</project.friendly-name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    
+    <scm-url>scm:git:git@github.michael-borkowski/jspice.git</scm-url>
   </properties>
+
+  <scm>
+    <connection>${scm-url}</connection>
+    <url>${scm-url}</url>
+    <developerConnection>${scm-url}</developerConnection>
+  </scm>
 </project>

@@ -17,9 +17,15 @@ public class TCP {
          System.exit(1);
          return;
       }
-      
-      if(commandLine.help) {
+
+      if (commandLine.help) {
          commander.usage();
+         return;
+      }
+
+      if (commandLine.udp) {
+         System.err.println("UDP is not yet implemented");
+         System.exit(1);
          return;
       }
 
@@ -36,7 +42,7 @@ public class TCP {
          }
          commandLine.rateReceive = commandLine.rateSend = commandLine.rate;
       }
-      
+
       SocketProxy sp;
       try {
          sp = new SocketProxy(commandLine.localPort, commandLine.remoteHost, commandLine.remotePort, commandLine.rateSend, commandLine.rateReceive);
@@ -46,7 +52,7 @@ public class TCP {
          System.exit(1);
          return;
       }
-      
+
       sp.run();
    }
 }

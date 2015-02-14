@@ -1,9 +1,9 @@
-package org.spicej;
+package org.spicej.impl;
 
 import org.spicej.impl.RealTimeTickSource;
 import org.spicej.ticks.TickListener;
 
-public class Playground01 {
+public class RealTimeTickSourcePlayground {
    static long x;
 
    public static void main(String[] args) throws InterruptedException {

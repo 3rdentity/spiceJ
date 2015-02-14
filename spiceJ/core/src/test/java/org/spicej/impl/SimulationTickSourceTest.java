@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.spicej.ticks.TickListener;
 
-public class RealTimeTickSourceTest {
+public class SimulationTickSourceTest {
 
    private SimulationTickSource sut;
 

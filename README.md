@@ -17,7 +17,7 @@ spiceJ consists of Java Proxy Objects of InputStream and OutputStream, hiding th
 
 The project is using maven as a built tool, so simply running
 
-``` mvn package ```
+    mvn package
 
 is enough to compile, test and package all source code.
 
@@ -33,17 +33,47 @@ To use spiceJ as a library, take a look at the `Streams` class, it contains help
 
 To start spiceJ in stand-alone TCP proxy mode, use the executable jar built from the `proxy` project. To get usage info, issue `--help`:
 
-``` java -jar path/to/proxy.jar -help ```
+    $ java -jar path/to/proxy.jar -help
 
 To start a TCP proxy with a given rate limit of bytes per second, use the following command:
 
-``` java -jar path/to/proxy.jar -l <local-port> -h <remote-host> -p <remote-port> -r <byterate> ```
+    $ java -jar path/to/proxy.jar -l <local-port> -h <remote-host> -p <remote-port> -r <byterate>
 
 You can also specify different upstream and downstream rates:
 
-``` java -jar path/to/proxy.jar -l <local-port> -h <remote-host> -p <remote-port> -a <upstream> -b <donwstream> ```
+    $ java -jar path/to/proxy.jar -l <local-port> -h <remote-host> -p <remote-port> -a <upstream> -b <donwstream>
 
 spiceJ creates a proxy listening on port `<local-port>` which connects to `<remote-host>:<remote-port>` whenever an inbound connection is accepted. It then relays data in both directions while respecting the upstream and downstream rates.
+
+## Testing
+
+### Try it!
+
+You can try the bandwidth limiting functionality using `nc` and `pv` (pipe viewer, a tool available for many Linux distributions). Using three terminals, do the following:
+
+In terminal 1 (listening terminal), launch:
+
+    $ nc -vvvlp 1235 | pv > /dev/null
+
+In terminal 2 (proxy), launch one of the following::
+
+    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 1000      # for    1 kB/s =    0.97 kiB
+    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 10000     # for   10 kB/s =    9.76 kiB
+    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 100000    # for  100 kB/s =   97.65 kiB
+    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 1000000   # for    1 MB/s =  976.56 kiB = 0.95 MiB 
+    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 10000000  # for   10 MB/s = 9765.62 MiB = 9.53 MiB
+
+Finally, in terminal 3 (sending terminal), launch:
+
+    $ cat /dev/zero | nc -vvv localhost 1234
+
+In terminal 1, `pv` should now should roughly the described byte rate. Note that `pv` uses binary prefixes (kiB, MiB, etc.), which denote multiples of 1024, and we specified powers of 10 in bytes per second, so the result deviates from the intuitively expected value.
+
+There is no lower bound, spiceJ is designed to work with byte rates well below 1 B/s, note that `pv` (in its current implementation) has a resolution of 1 s, which means that byte rates lower than 1 B/s are harder to measure. A natural upper bound of the byte rate is your system throughput, to which spiceJ naturally adds some overhead.
+
+### Unit Tests
+
+Unit tests are present for most classes. In detail, the classes providing the external outcome (`RateLimitInputStream` and `RateLimitOutputStream`) are tested. Untested classes are simple utility methods, getters/setters and user interface (command line parsing) classes.
 
 ## Contributing
 

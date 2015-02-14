@@ -23,4 +23,7 @@ public class CommandLine {
 
    @Parameter(names = { "--help", "-?" }, description = "Prints usage.")
    public boolean help;
+   
+   @Parameter(names = { "--udp", "-u"}, description = "Use UDP instead of TCP (not yet implemented)")
+   public boolean udp = false;
 }

@@ -19,7 +19,7 @@ The project is using maven as a built tool, so simply running
 
     mvn package
 
-is enough to compile, test and package all source code.
+is enough to compile, test and package all source code. The stand-alone proxy is packaged as a runnable JAR `proxy/target/proxy-X.Y.Z-jar-with-dependencies.jar`, where `X.Y.Z` is the current version.
 
 ## Usage
 
@@ -67,7 +67,7 @@ Finally, in terminal 3 (sending terminal), launch:
 
     $ cat /dev/zero | nc -vvv localhost 1234
 
-In terminal 1, `pv` should now should roughly the described byte rate. Note that `pv` uses binary prefixes (kiB, MiB, etc.), which denote multiples of 1024, and we specified powers of 10 in bytes per second, so the result deviates from the intuitively expected value.
+In terminal 1, `pv` should now show roughly the described byte rate. Note that `pv` uses binary prefixes (kiB, MiB, etc.), which denote multiples of 1024, and we specified powers of 10 in bytes per second, so the result deviates from the intuitively expected value.
 
 There is no lower bound, spiceJ is designed to work with byte rates well below 1 B/s, note that `pv` (in its current implementation) has a resolution of 1 s, which means that byte rates lower than 1 B/s are harder to measure. A natural upper bound of the byte rate is your system throughput, to which spiceJ naturally adds some overhead.
 

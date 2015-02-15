@@ -33,6 +33,10 @@ import org.spicej.ticks.TickListener;
  */
 public class RealTimeTickSourceTests {
 
+   public static void main(String[] args) {
+      run();
+   }
+
    /**
     * The maximal relative error permitted (0.03 = 3%)
     */

@@ -66,7 +66,8 @@ public class RateCalculator {
    public static final int NS_PER_MS = 1000000;
 
    /**
-    * The lower bound for the interval.
+    * The lower bound for the interval. Intervals lower than this might not be
+    * reliably possible on some hardware.
     */
    public static final int MIN_INTERVAL_NS = 100 * NS_PER_MS; // 100 ms = minimal interval
 

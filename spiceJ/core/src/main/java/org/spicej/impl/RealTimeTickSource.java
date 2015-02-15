@@ -21,10 +21,35 @@ import org.spicej.ticks.TickListener;
  * {@link #setKeepAlive(boolean)}.
  */
 public class RealTimeTickSource extends AbstractTickSource {
-   private final int interval;
+   private final long interval;
    private boolean keepAlive = false;
 
    private MyTimer timer;
+
+   /**
+    * The threshold below which busy waiting is employed. Waiting via Java sleep
+    * methods has the advantage of reduced CPU usage, however, a certain time
+    * cost is encountered.
+    * 
+    * Therefore, intervals below {@link #BUSY_WAITING_THRESHOLD} are implemented
+    * with busy waiting. Intervals above are implemented either by
+    * non-synchronized waiting or by synchronized waiting (see
+    * {@link #SYNCHRONIZATION_THRESHOLD}).
+    * 
+    * On the current development machine, this threshold had to be at least a
+    * value of 4.2 ms to ensure the real-time tests passing, which is why 15 ms
+    * have been chosen as a margin. Above 10 ms of threshold, an constat error
+    * rate of less than 1 % was measured.
+    */
+   public static final long BUSY_WAITING_THRESHOLD = 10 * 1000000;
+
+   /**
+    * The threshold above which a different implementation of the internal timer
+    * is used, which is only considering milliseconds. This means thta above
+    * this threshold, the precision of this tick source is reduced to
+    * milliseconds.
+    */
+   public static final long MILLISECOND_THRESHOLD = 50 * 1000000;
 
    /**
     * Creates a running real time tick source with ticks generated at the given
@@ -34,7 +59,7 @@ public class RealTimeTickSource extends AbstractTickSource {
     *           the interval of ticks in nanoseconds
     * 
     */
-   public RealTimeTickSource(int nanoSecondsPerTick) {
+   public RealTimeTickSource(long nanoSecondsPerTick) {
       this(nanoSecondsPerTick, true);
    }
 
@@ -46,7 +71,7 @@ public class RealTimeTickSource extends AbstractTickSource {
     * @param start
     *           whether the tick source should be started upon creation
     */
-   public RealTimeTickSource(int nanoSecondsPerTick, boolean start) {
+   public RealTimeTickSource(long nanoSecondsPerTick, boolean start) {
       this.interval = nanoSecondsPerTick;
       if (start)
          start();
@@ -90,7 +115,13 @@ public class RealTimeTickSource extends AbstractTickSource {
       if (timer != null)
          throw new IllegalStateException("already running");
 
-      timer = new MyTimer();
+      if (interval < BUSY_WAITING_THRESHOLD)
+         timer = new MyBusyTimer();
+      else if (interval < MILLISECOND_THRESHOLD)
+         timer = new MyWaitingTimer();
+      else
+         timer = new MyMillisecondTimer();
+
       Thread thread = new Thread(timer, "timer");
       thread.setDaemon(true);
       thread.start();
@@ -109,11 +140,34 @@ public class RealTimeTickSource extends AbstractTickSource {
       timer = null;
    }
 
-   private class MyTimer implements Runnable {
+   private abstract class MyTimer implements Runnable {
+
+      protected boolean cancel = false;
+
+      void cancel() {
+         this.cancel = true;
+      }
+   }
+
+   private class MyBusyTimer extends MyTimer {
+
+      @Override
+      public void run() {
+         long nextWakeup = System.nanoTime();
+
+         while (!cancel) {
+            if (System.nanoTime() >= nextWakeup) {
+               RealTimeTickSource.super.doTick();
+               nextWakeup = nextWakeup + interval;
+            }
+         }
+      }
+
+   }
+
+   private class MyWaitingTimer extends MyTimer {
 
       private final Object lock = new Object();
-
-      private boolean cancel = false;
 
       @Override
       public void run() {
@@ -125,19 +179,67 @@ public class RealTimeTickSource extends AbstractTickSource {
                nextWakeup = nextWakeup + interval;
             }
 
-            synchronized (lock) {
-               int period = Math.max(10, (int) ((nextWakeup - System.nanoTime()) / 4));
+            long period = (long) ((nextWakeup - System.nanoTime()) / 4);
+
+            /* 
+             * don't sync-sleep below 1 ms per sleep slice, since method
+             * call overhead will take loner than that (1 ms is very long
+             * for a method call, this is a safety margin for slower systems)
+             */
+            if (period > 1 * 1000000) {
+               period = Math.min(period, 10 * 1000000);
                try {
-                  lock.wait(period / 1000000, period % 1000000);
-               } catch (InterruptedException e) {
-                  Thread.currentThread().interrupt();
-               }
+                  synchronized (lock) {
+                     lock.wait(period / 1000000, (int) (period % 1000000));
+                  }
+               } catch (InterruptedException ignore) {}
             }
          }
       }
 
       void cancel() {
-         this.cancel = true;
+         super.cancel();
+         synchronized (lock) {
+            lock.notifyAll();
+         }
+      }
+
+   }
+
+   private class MyMillisecondTimer extends MyTimer {
+
+      private final Object lock = new Object();
+
+      @Override
+      public void run() {
+         long nextWakeup = System.currentTimeMillis();
+
+         while (!cancel) {
+            if (System.currentTimeMillis() >= nextWakeup) {
+               RealTimeTickSource.super.doTick();
+               nextWakeup = nextWakeup + interval / 1000000;
+            }
+
+            long period = (long) ((nextWakeup - System.currentTimeMillis()) / 4);
+
+            /* 
+             * don't sync-sleep below 1 ms per sleep slice, since method
+             * call overhead will take loner than that (1 ms is very long
+             * for a method call, this is a safety margin for slower systems)
+             */
+            if (period > 5) {
+               period = Math.min(period, 100);
+               try {
+                  synchronized (lock) {
+                     lock.wait(period);
+                  }
+               } catch (InterruptedException ignore) {}
+            }
+         }
+      }
+
+      void cancel() {
+         super.cancel();
          synchronized (lock) {
             lock.notifyAll();
          }

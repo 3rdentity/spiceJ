@@ -12,6 +12,7 @@
   <modules>
     <module>core</module>
     <module>proxy</module>
+    <module>real-time-tests</module>
   </modules>
 
   <properties>

@@ -8,7 +8,7 @@ import org.spicej.ticks.TickListener;
 
 /**
  * An abstract tick source keeping track of its listeners. The tick source is in
- * a non-initialized state until the first call to {@link #doTick(long)}.
+ * a non-initialized state until the first call to {@link #doTick()}.
  */
 public abstract class AbstractTickSource implements TickSource {
    private long tick = -1;
@@ -27,8 +27,6 @@ public abstract class AbstractTickSource implements TickSource {
 
    /**
     * Distributes a tick event to its listeners.
-    * 
-    * @param tick
     */
    protected void doTick() {
       tick++;

@@ -32,9 +32,8 @@ public class RealTimeTickSource extends AbstractTickSource {
     * cost is encountered.
     * 
     * Therefore, intervals below {@link #BUSY_WAITING_THRESHOLD} are implemented
-    * with busy waiting. Intervals above are implemented either by
-    * non-synchronized waiting or by synchronized waiting (see
-    * {@link #SYNCHRONIZATION_THRESHOLD}).
+    * with busy waiting. Intervals above are implemented by synchronized
+    * waiting.
     * 
     * On the current development machine, this threshold had to be at least a
     * value of 4.2 ms to ensure the real-time tests passing, which is why 15 ms

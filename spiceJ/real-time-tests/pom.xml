@@ -2,72 +2,25 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>spiceJ</groupId>
-    <artifactId>spiceJ</artifactId>
+    <groupId>at.borkowski.spicej</groupId>
+    <artifactId>spicej</artifactId>
     <version>0.0.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>real-time-tests</artifactId>
   <name>${project.friendly-name}: Real-Time Tests</name>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.2</version>
-        <configuration>
-          <source>${java-version}</source>
-          <target>${java-version}</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
   <dependencies>
     <dependency>
-      <groupId>spiceJ</groupId>
+      <groupId>at.borkowski.spiceJ</groupId>
       <artifactId>core</artifactId>
       <version>0.0.3-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>spiceJ</groupId>
+      <groupId>at.borkowski.spiceJ</groupId>
       <artifactId>proxy</artifactId>
       <version>0.0.3-SNAPSHOT</version>
     </dependency>
-
-    <!-- SLF4J: Logging -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${slf4j-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <version>${slf4j-version}</version>
-    </dependency>
-
-    <!-- Testing -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit-version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>${mockito-version}</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
-
 
 </project>

@@ -75,6 +75,10 @@ There is almost no lower bound; spiceJ is designed to work with byte rates well 
 
 Unit tests are present for most classes. In detail, the classes providing the external outcome (`RateLimitInputStream` and `RateLimitOutputStream`) are tested. Untested classes are simple utility methods, getters/setters and user interface (command line parsing) classes.
 
+### Real-Time Tests
+
+The performance of real-time components can't trivially be tested using Unit Tests, but there is a dedicated module (`real-time-tests`) containing test-like classes which can be executed and report their results. Its purpose is solely to verify that the real-time performance is within a certain error margin, it has no production value (hence the rather low code quality). In-code-documentation should suffice to understand how to interpret the results.
+
 ## Contributing
 
 Feel free to contribute by creating pull requests and/or using the "Issues" section.

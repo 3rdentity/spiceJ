@@ -2,6 +2,7 @@ package org.spicej.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
@@ -43,14 +44,34 @@ public class SimulationTickSourceTest {
 
       assertEquals(2, sut.getCurrentTick());
       verify(listenerA).tick(2);
-      
+
       sut.addListener(listenerB);
-      
+
       sut.advance();
 
       assertEquals(3, sut.getCurrentTick());
       verify(listenerA).tick(3);
       verify(listenerB).tick(3);
+      
+      sut.removeListener(listenerA);
+
+      sut.advance();
+
+      assertEquals(4, sut.getCurrentTick());
+      verify(listenerA, never()).tick(4);
+      verify(listenerB).tick(4);
+   }
+
+   @Test
+   public void testReset() {
+      assertEquals(0, sut.getCurrentTick());
+      sut.advance();
+      assertEquals(1, sut.getCurrentTick());
+
+      sut.reset();
+
+      sut.advance();
+      assertEquals(0, sut.getCurrentTick());
    }
 
 }

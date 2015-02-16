@@ -12,12 +12,12 @@
 
   <dependencies>
     <dependency>
-      <groupId>at.borkowski.spiceJ</groupId>
+      <groupId>at.borkowski.spicej</groupId>
       <artifactId>core</artifactId>
       <version>0.0.3-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>at.borkowski.spiceJ</groupId>
+      <groupId>at.borkowski.spicej</groupId>
       <artifactId>proxy</artifactId>
       <version>0.0.3-SNAPSHOT</version>
     </dependency>

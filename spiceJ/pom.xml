@@ -21,7 +21,7 @@
     <mockito-version>1.9.5</mockito-version>
     <slf4j-version>1.7.10</slf4j-version>
 
-    <project.friendly-name>SpiceJ</project.friendly-name>
+    <project.friendly-name>spiceJ</project.friendly-name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 

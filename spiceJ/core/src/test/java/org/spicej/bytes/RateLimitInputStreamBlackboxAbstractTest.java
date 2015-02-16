@@ -24,8 +24,8 @@ public abstract class RateLimitInputStreamBlackboxAbstractTest {
 
       t = new SimulationTickSource();
       sut = new RateLimitInputStream(pis, t, 10, getPrescaler());
-      sut.testEnableFailOnHang();
-      sut.testSetIdleNotify(new IdleNotify() {
+      sut.test__EnableFailOnHang();
+      sut.test__SetIdleNotify(new IdleNotify() {
 
          @Override
          public boolean idle() {

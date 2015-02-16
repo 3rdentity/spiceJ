@@ -173,22 +173,22 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
    /**
     * Testability function only. See {@link RateHelper}.
     */
-   void testEnableFailOnHang() {
-      rateHelper.testEnableFailOnHang();
+   void test__EnableFailOnHang() {
+      rateHelper.test__EnableFailOnHang();
    }
 
    /**
     * Testability function only. See {@link RateHelper}.
     */
-   void testDisableFailOnHang() {
-      rateHelper.testDisableFailOnHang();
+   void test__DisableFailOnHang() {
+      rateHelper.test__DisableFailOnHang();
    }
 
    /**
     * Testability function only. See {@link RateHelper}.
     */
-   void testSetIdleNotify(IdleNotify target) {
-      rateHelper.testSetIdleNotify(target);
+   void test__SetIdleNotify(IdleNotify target) {
+      rateHelper.test__SetIdleNotify(target);
    }
 
    /**

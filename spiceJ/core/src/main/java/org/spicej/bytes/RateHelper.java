@@ -22,8 +22,8 @@ class RateHelper {
    private SleepWakeup sleep = new SleepWakeup();
    private int timewiseAvailable;
 
-   private boolean testFailOnHang;
-   private IdleNotify testIdleNotify;
+   private boolean test__FailOnHang;
+   private IdleNotify test__IdleNotify;
 
    /**
     * Creates a helper and registers it with the given {@link TickSource}.
@@ -129,9 +129,9 @@ class RateHelper {
    }
 
    private void sleep() {
-      if (testIdleNotify != null && testIdleNotify.idle())
+      if (test__IdleNotify != null && test__IdleNotify.idle())
          return;
-      if (testFailOnHang)
+      if (test__FailOnHang)
          throw new AssertionError("should not hang");
 
       sleep.sleep();
@@ -142,24 +142,24 @@ class RateHelper {
     * {@link #takeOne()} fails if waiting (blocking) would occur. This is
     * necessary to prevent blocking in unit tests.
     */
-   void testEnableFailOnHang() {
-      testFailOnHang = true;
+   void test__EnableFailOnHang() {
+      test__FailOnHang = true;
    }
 
    /**
     * Testability method: disables that any call to {@link #take(int)} or
     * {@link #takeOne()} fails if waiting (blocking) would occur.
     */
-   void testDisableFailOnHang() {
-      testFailOnHang = false;
+   void test__DisableFailOnHang() {
+      test__FailOnHang = false;
    }
 
    /**
     * Testability method: sets a target to call when waiting (blocking) occurs.
     * This is necessary for unit tests.
     */
-   void testSetIdleNotify(IdleNotify target) {
-      this.testIdleNotify = target;
+   void test__SetIdleNotify(IdleNotify target) {
+      this.test__IdleNotify = target;
    }
 
    private class Listener implements TickListener {

@@ -20,8 +20,8 @@ public class RateHelperTest {
    public void setUp() throws Exception {
       t = new SimulationTickSource();
       sut = new RateHelper(t, 10, 1);
-      sut.testEnableFailOnHang();
-      sut.testSetIdleNotify(new IdleNotify() {
+      sut.test__EnableFailOnHang();
+      sut.test__SetIdleNotify(new IdleNotify() {
 
          @Override
          public boolean idle() {

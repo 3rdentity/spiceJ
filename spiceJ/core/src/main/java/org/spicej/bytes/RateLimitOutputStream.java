@@ -70,16 +70,16 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
       real.flush();
    }
 
-   void testEnableFailOnHang() {
-      rateHelper.testEnableFailOnHang();
+   void test__EnableFailOnHang() {
+      rateHelper.test__EnableFailOnHang();
    }
 
-   void testDisableFailOnHang() {
-      rateHelper.testDisableFailOnHang();
+   void test__DisableFailOnHang() {
+      rateHelper.test__DisableFailOnHang();
    }
 
-   void testSetIdleNotify(IdleNotify target) {
-      rateHelper.testSetIdleNotify(target);
+   void test__SetIdleNotify(IdleNotify target) {
+      rateHelper.test__SetIdleNotify(target);
    }
 
 }

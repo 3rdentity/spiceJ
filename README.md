@@ -85,8 +85,7 @@ Feel free to contribute by creating pull requests and/or using the "Issues" sect
 
 ## History
 
-- 2015-02-14: Added documentation
-- 2015-02-13: Project Started, initial development
+- 2015-02-13: Started project development
 
 ## Credits
 

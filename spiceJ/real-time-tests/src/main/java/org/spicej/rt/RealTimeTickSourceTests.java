@@ -17,10 +17,10 @@ import org.spicej.ticks.TickListener;
  */
 
 /**
- * This class performs a series of tests measuring the real-time components of
- * spiceJ. Since these tests do not fulfill some crucial criteria, they are not
- * classified as regular (unit) tests in the classical meaning, and are not
- * executed automatically upon builds.
+ * This class performs a series of tests measuring the performance of
+ * {@link RealTimeTickSource}. Since these tests do not fulfill some crucial
+ * criteria, they are not classified as regular (unit) tests in the classical
+ * meaning, and are not executed automatically upon builds.
  * 
  * <ul>
  * <li>They don't have a binary yes/no result since they measure system
@@ -58,13 +58,15 @@ public class RealTimeTickSourceTests {
     */
    public static final int BUFFER_CAPACITY = 20000000;
 
-   // this is spaghetti code, that's why we have a lot of static variables :-(
-   private static int deltaCount;
-   private static long minBound = 0;
-   private static Long out_min = null;
-   private static Long minReliable = null;
-   private static int reliability = 0;
-   private static int sequence = 0;
+   // unfortunately, this class is spaghetti code, that's why we have a lot of static variables :-(
+   private static int tickCount;             // the amount of ticks we have acquired
+   private static int deltaCount;            // the amount of deltas we have acquired
+   private static long minBound = 0;         // we don't measure below this interval
+   private static Long out_min = null;       // the lowest delta we've seen
+   private static Long minReliable = null;   // the "result": this and all higher intervals could produce reliable results
+   private static int reliability = 0;       // how many results were above minReliable that could produce reliable results    
+   private static int sequence = 0;          // check variable to avoid concurrent modifications of buffer (= optimistic locking)
+   private static boolean finished;          // whether the tick collector thread has finished
 
    private static long[] buffer = new long[BUFFER_CAPACITY];
    private static long[] deltas = new long[BUFFER_CAPACITY];
@@ -144,9 +146,6 @@ public class RealTimeTickSourceTests {
       }
    }
 
-   private static int tickCounter;
-   private static boolean finished;
-
    private synchronized static void performSeries(double nanoSeconds) {
       if (nanoSeconds < minBound)
          return;
@@ -199,7 +198,7 @@ public class RealTimeTickSourceTests {
 
       msns(nanoSeconds_);
 
-      System.out.printf(" n %8d ", tickCounter);
+      System.out.printf(" n %8d ", tickCount);
 
       if (deltaCount == 0) {
          System.out.print("no measured deltas");
@@ -208,8 +207,8 @@ public class RealTimeTickSourceTests {
 
          double average = average();
 
-         boolean ticksOk = tickCounter == targetTickCount;
-         boolean ticksAlright = tickCounter >= (targetTickCount * 95 / 100);
+         boolean ticksOk = tickCount == targetTickCount;
+         boolean ticksAlright = tickCount >= (targetTickCount * 95 / 100);
 
          System.out.printf("avg %13.2f ns ", average);
 
@@ -220,7 +219,7 @@ public class RealTimeTickSourceTests {
          msns((long) (average - nanoSeconds));
          System.out.printf(") ");
          if (!ticksOk)
-            System.out.print("(INCOMPLETE MEASUREMENT " + format(100D * tickCounter / targetTickCount) + " %) ");
+            System.out.print("(INCOMPLETE MEASUREMENT " + format(100D * tickCount / targetTickCount) + " %) ");
          if (!epsilonOk)
             System.out.print("(ERROR TOO HIGH, > " + format(100D * EPSILON) + " %) ");
          ok = ticksAlright && epsilonOk;
@@ -246,7 +245,7 @@ public class RealTimeTickSourceTests {
    private static void performMeasurement(long nanoSeconds_, final int targetTickCount) {
       RealTimeTickSource sut = new RealTimeTickSource(nanoSeconds_, false);
 
-      tickCounter = 0;
+      tickCount = 0;
       finished = false;
 
       for (int i = 0; i < buffer.length; i++)
@@ -266,8 +265,8 @@ public class RealTimeTickSourceTests {
                return;
             if (sequence != currentSequence)
                return;
-            buffer[tickCounter++] = time;
-            finished = tickCounter >= targetTickCount;
+            buffer[tickCount++] = time;
+            finished = tickCount >= targetTickCount;
          }
       });
 

@@ -87,7 +87,13 @@ public class RateCalculatorTest {
    }
 
    private void test(float rate) {
-      Result r = RateCalculator.calculate(rate);
+      evaluate(rate, RateCalculator.calculate(rate));
+      evaluate(rate, RateCalculator.calculate(rate, 50 * 1000000));
+      evaluate(rate, RateCalculator.calculate(rate, 10 * 1000000));
+      evaluate(rate, RateCalculator.calculate(rate, 1 * 1000000));
+   }
+   
+   private void evaluate(float rate, Result r) {
       BigDecimal actualRate_ = new BigDecimal(RateCalculator.NS_PER_S);
       actualRate_ = actualRate_.multiply(new BigDecimal(r.getBytesPerTick()));
       actualRate_ = actualRate_.divide(new BigDecimal(r.getPrescale()), SCALE, RoundingMode.HALF_UP);

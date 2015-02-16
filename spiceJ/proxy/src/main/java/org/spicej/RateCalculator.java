@@ -69,7 +69,7 @@ public class RateCalculator {
     * The lower bound for the interval. Intervals lower than this might not be
     * reliably possible on some hardware.
     */
-   public static final int MIN_INTERVAL_NS = 100 * NS_PER_MS; // 100 ms = minimal interval
+   public static final int MIN_INTERVAL_NS = 50 * NS_PER_MS;
 
    /**
     * The upper bound for the interval.
@@ -79,7 +79,7 @@ public class RateCalculator {
    /**
     * The threshold value for byterates above which MIN_INTERVAL is reached.
     */
-   public static final long THRESHOLD = NS_PER_S / MIN_INTERVAL_NS;
+   public static final long THRESHOLD = (long) Math.ceil((double) NS_PER_S / MIN_INTERVAL_NS);
 
    /**
     * The scale (see {@link BigDecimal}) used for internal calculations.
@@ -87,12 +87,28 @@ public class RateCalculator {
    public static final int SCALE = 60;
 
    /**
-    * Performs a calculation. See {@link RateCalculator} for details.
+    * Performs a calculation with the default minimal interval (see
+    * {@link #MIN_INTERVAL_NS}). See {@link RateCalculator} for details.
     * 
     * @param rateBytesPerSecond
     * @return
     */
    public static Result calculate(float rateBytesPerSecond) {
+      return calculate(rateBytesPerSecond, MIN_INTERVAL_NS);
+   }
+
+   /**
+    * Performs a calculation with the given minimal interval. See
+    * {@link RateCalculator} for details.
+    * 
+    * @param rateBytesPerSecond
+    * @param minInterval
+    *           The minimal interval in nanoseconds.
+    * @return
+    */
+   public static Result calculate(float rateBytesPerSecond, int minInterval) {
+      int threshold = (int) Math.ceil((double) NS_PER_S / minInterval);
+
       if (rateBytesPerSecond < 1) {
          BigDecimal interval_ = new BigDecimal(NS_PER_S).divide(new BigDecimal(rateBytesPerSecond), SCALE, RoundingMode.HALF_UP);
 
@@ -125,14 +141,14 @@ public class RateCalculator {
             throw new IllegalArgumentException("rate too low (necessary prescale too big)");
 
          return new Result(1, prescale.intValue(), interval_.intValue());
-      } else if (rateBytesPerSecond < THRESHOLD) {
+      } else if (rateBytesPerSecond < threshold) {
          // 1 <= rate < MAX_FRACTIONAL_RATE
          // interval: 1s / rate
 
          int interval = (int) (NS_PER_S / rateBytesPerSecond);
          return new Result(1, 1, interval);
       } else {
-         int interval = MIN_INTERVAL_NS;
+         int interval = (int) minInterval;
          BigDecimal bytespertick = new BigDecimal(rateBytesPerSecond);
          bytespertick = bytespertick.divide(new BigDecimal(NS_PER_S), SCALE, RoundingMode.HALF_UP);
          bytespertick = bytespertick.multiply(new BigDecimal(interval));

@@ -6,6 +6,8 @@
   <version>0.0.4-SNAPSHOT</version>
 
   <name>${project.friendly-name}</name>
+  <url>https://github.com/michael-borkowski/spiceJ</url>
+  <description>A network traffic shaper written in Java</description>
 
   <packaging>pom</packaging>
 

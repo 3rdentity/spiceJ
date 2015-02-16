@@ -9,6 +9,7 @@
 
   <artifactId>real-time-tests</artifactId>
   <name>${project.friendly-name}: Real-Time Tests</name>
+  <description>Real-time tests for spiceJ</description>
 
   <dependencies>
     <dependency>

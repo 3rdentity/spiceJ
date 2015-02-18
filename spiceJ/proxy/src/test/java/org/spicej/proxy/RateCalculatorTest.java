@@ -1,4 +1,4 @@
-package org.spicej;
+package org.spicej.proxy;
 
 import static org.junit.Assert.fail;
 
@@ -7,7 +7,8 @@ import java.math.RoundingMode;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.spicej.RateCalculator.Result;
+import org.spicej.proxy.RateCalculator;
+import org.spicej.proxy.RateCalculator.Result;
 
 public class RateCalculatorTest {
 

@@ -1,4 +1,4 @@
-package org.spicej;
+package org.spicej.proxy;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

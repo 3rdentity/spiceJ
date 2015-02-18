@@ -1,10 +1,12 @@
-package org.spicej;
+package org.spicej.proxy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.spicej.proxy.ProxyMain;
+import org.spicej.proxy.SocketProxy;
 
 public class ProxyMainTest {
 

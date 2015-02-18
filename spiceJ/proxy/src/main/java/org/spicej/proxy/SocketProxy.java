@@ -1,4 +1,4 @@
-package org.spicej;
+package org.spicej.proxy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,8 +6,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
-import org.spicej.RateCalculator.Result;
+import org.spicej.Streams;
 import org.spicej.impl.RealTimeTickSource;
+import org.spicej.proxy.RateCalculator.Result;
 
 /**
  * A proxy provider for TCP connections allowing for upstream and downstream

@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
-import org.spicej.RateCalculator;
-import org.spicej.RateCalculator.Result;
 import org.spicej.Streams;
 import org.spicej.bytes.RateLimitInputStream;
 import org.spicej.impl.RealTimeTickSource;
+import org.spicej.proxy.RateCalculator;
+import org.spicej.proxy.RateCalculator.Result;
 
 /*
  * UGLY CODE

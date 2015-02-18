@@ -16,9 +16,9 @@ import org.spicej.impl.RealTimeTickSource;
  * connection. Upstream and downstream rate limitations are possible.
  */
 public class SocketProxy implements Runnable {
-   private final int remotePort;
-   private final String remoteHost;
-   private final Float rateUp, rateDown;
+   final int localPort, remotePort;
+   final String remoteHost;
+   final Float rateUp, rateDown;
 
    private ServerSocket listener;
 
@@ -39,13 +39,12 @@ public class SocketProxy implements Runnable {
     *           <code>null</code> for no limit
     * @throws IOException
     */
-   public SocketProxy(int localPort, String remoteHost, int remotePort, Float rateUp, Float rateDown) throws IOException {
+   public SocketProxy(int localPort, String remoteHost, int remotePort, Float rateUp, Float rateDown) {
+      this.localPort = localPort;
       this.remoteHost = remoteHost;
       this.remotePort = remotePort;
       this.rateUp = rateUp;
       this.rateDown = rateDown;
-
-      listener = new ServerSocket(localPort);
    }
 
    private static InputStream rate(InputStream inputStream, Float rate) {
@@ -54,6 +53,12 @@ public class SocketProxy implements Runnable {
 
       Result calculation = RateCalculator.calculate(rate);
       return Streams.limitRate(inputStream, new RealTimeTickSource(calculation.getTickNanosecondInterval(), true), calculation.getBytesPerTick(), calculation.getPrescale());
+   }
+
+   public void initialize() throws IOException {
+      if (listener != null)
+         throw new IllegalStateException("already initialized");
+      listener = new ServerSocket(localPort);
    }
 
    @Override

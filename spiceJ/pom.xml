@@ -73,6 +73,18 @@
               </execution>
             </executions>
           </plugin>
+
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.5</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -99,6 +111,7 @@
         <configuration>
           <goals>deploy</goals>
           <autoVersionSubmodules>true</autoVersionSubmodules>
+          <useReleaseProfile>false</useReleaseProfile>
           <releaseProfiles>release</releaseProfiles>
           <tagNameFormat>@{project.version}</tagNameFormat>
         </configuration>
@@ -126,18 +139,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <!-- <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.5</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
-        </configuration>
-      </plugin> -->
     </plugins>
 
     <extensions>
@@ -150,10 +151,18 @@
   </build>
 
   <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
     <repository>
-      <id>ssh-repository</id>
-      <url>scpexe://porto.borkowski.at/var/www/www-maven/docroot/repo</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
+    <!-- <repository>
+      <id>porto-ssh</id>
+      <url>scpexe://porto.borkowski.at/var/www/www-maven/docroot/repo</url>
+    </repository> -->
   </distributionManagement>
 
   <dependencies>

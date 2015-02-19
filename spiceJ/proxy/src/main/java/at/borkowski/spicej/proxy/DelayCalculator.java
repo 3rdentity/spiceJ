@@ -3,14 +3,23 @@ package at.borkowski.spicej.proxy;
 public class DelayCalculator {
    private DelayCalculator() {}
 
-   public static final long MAX_DIVIDER = 200;
+   public static final float DEFAULT_EPSILON = 0.05F;
+
    public static final long MAX_INTERVAL = 1000 * 1000000;
 
    public static Result calculate(long nanoseconds) {
-      if (nanoseconds < MAX_DIVIDER)
+      return calculate(nanoseconds, DEFAULT_EPSILON);
+   }
+
+   public static Result calculate(long nanoseconds, float epsilon) {
+      if (epsilon <= 0 || epsilon >= 1)
+         throw new IllegalArgumentException("0 < epsilon < 1 not satisfied");
+      
+      long max_divider = (int)(1D / epsilon);
+      if (nanoseconds < max_divider)
          return new Result(nanoseconds, 1);
 
-      long interval = Math.min(MAX_INTERVAL, nanoseconds / MAX_DIVIDER);
+      long interval = Math.min(MAX_INTERVAL, nanoseconds / max_divider);
       long correction = nanoseconds / interval;
 
       return new Result(interval, correction);

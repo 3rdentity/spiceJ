@@ -44,7 +44,7 @@ public class RealTimeTickSource extends AbstractTickSource {
 
    /**
     * The threshold above which a different implementation of the internal timer
-    * is used, which is only considering milliseconds. This means thta above
+    * is used, which is only considering milliseconds. This means that above
     * this threshold, the precision of this tick source is reduced to
     * milliseconds.
     */

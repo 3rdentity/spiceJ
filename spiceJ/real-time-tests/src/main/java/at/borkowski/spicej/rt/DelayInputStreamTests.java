@@ -40,7 +40,7 @@ public class DelayInputStreamTests {
       // scale: indicated the power of 10 (in ns) of orders of magnitude to test
       // eg. scale = 2 -> test in orders of magnitude of 10^2 ns
 
-      for (int scale = 1; scale < 10; scale++)
+      for (int scale = 1; scale < 91; scale++)
          testScale(scale);
    }
 
@@ -48,7 +48,7 @@ public class DelayInputStreamTests {
    private static void testScale(int scale) throws IOException {
       long base = (long) Math.pow(10, scale);
 
-      System.out.print("scale: 10E" + scale + " b/s (");
+      System.out.print("scale: 10E" + scale + " ns (");
       format(base);
       System.out.println(")");
 
@@ -132,11 +132,11 @@ public class DelayInputStreamTests {
    }
 
    private static void format(long nanoseconds) {
-      if (nanoseconds < 999000)
+      if (nanoseconds < 1000000)
          System.out.printf("%8.0f ns", (double) nanoseconds);
-      else if (nanoseconds < 999000000)
+      else if (nanoseconds < 1000000000)
          System.out.printf("%8.2f ms", (double) nanoseconds / 1000000);
       else
-         System.out.printf("%8.2f s", (double) nanoseconds / 1000000000);
+         System.out.printf("%8.2f  s", (double) nanoseconds / 1000000000);
    }
 }

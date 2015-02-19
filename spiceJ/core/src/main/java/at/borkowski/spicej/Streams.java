@@ -3,6 +3,7 @@ package at.borkowski.spicej;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import at.borkowski.spicej.streams.DelayedInputStream;
 import at.borkowski.spicej.streams.RateLimitInputStream;
 import at.borkowski.spicej.streams.RateLimitOutputStream;
 import at.borkowski.spicej.ticks.TickSource;
@@ -57,6 +58,10 @@ public class Streams {
     */
    public static RateLimitOutputStream limitRate(OutputStream base, TickSource tickSource, int bytesPerTick, int prescaler) {
       return new RateLimitOutputStream(base, tickSource, bytesPerTick, prescaler);
+   }
+
+   public static DelayedInputStream addDelay(InputStream base, TickSource tickSource, long delay, int bufferSize) {
+      return new DelayedInputStream(tickSource, base, delay, bufferSize);
    }
 
 }

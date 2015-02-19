@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.borkowski.spicej.impl.SimulationTickSource;
 import at.borkowski.spicej.ticks.TickListener;
 
 public class SimulationTickSourceTest {

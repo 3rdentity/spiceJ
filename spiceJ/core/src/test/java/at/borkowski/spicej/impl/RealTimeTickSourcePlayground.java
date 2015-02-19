@@ -1,6 +1,5 @@
 package at.borkowski.spicej.impl;
 
-import at.borkowski.spicej.impl.RealTimeTickSource;
 import at.borkowski.spicej.ticks.TickListener;
 
 public class RealTimeTickSourcePlayground {

@@ -19,6 +19,7 @@ public class SleepWakeup {
     * Blocks the calling thread until another thread calls this object's
     * {@link #wakeup()}.
     */
+   // TODO javadoc is wrong
    public void sleep() {
       synchronized (lock) {
          try {

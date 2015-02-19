@@ -4,15 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import at.borkowski.spicej.impl.SimulationTickSource;
-import at.borkowski.spicej.streams.RateLimitInputStream;
 import at.borkowski.spicej.streams.RateHelper.IdleNotify;
+import at.borkowski.spicej.streams.util.PipedInputStream;
+import at.borkowski.spicej.streams.util.PipedOutputStream;
 
 public class RateLimitInputStreamTest {
 

@@ -6,9 +6,6 @@ import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.borkowski.spicej.proxy.ProxyMain;
-import at.borkowski.spicej.proxy.SocketProxy;
-
 public class ProxyMainTest {
 
    public static float DELTA = 0.00001F;

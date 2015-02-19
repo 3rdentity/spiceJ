@@ -1,14 +1,14 @@
 package at.borkowski.spicej.rt;
 
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 
 import at.borkowski.spicej.Streams;
 import at.borkowski.spicej.impl.RealTimeTickSource;
 import at.borkowski.spicej.proxy.RateCalculator;
 import at.borkowski.spicej.proxy.RateCalculator.Result;
 import at.borkowski.spicej.streams.RateLimitInputStream;
+import at.borkowski.spicej.streams.util.PipedInputStream;
+import at.borkowski.spicej.streams.util.PipedOutputStream;
 
 /*
  * UGLY CODE
@@ -117,6 +117,7 @@ public class RateLimitInputStreamTests {
          long t1 = System.currentTimeMillis();
          sequence++;
          sut.close();
+         t.stop();
 
          long tt = t1 - t0;
          double rate = 1000D * done / tt;

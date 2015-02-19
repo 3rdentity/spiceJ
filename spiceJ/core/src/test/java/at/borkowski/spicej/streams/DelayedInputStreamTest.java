@@ -4,14 +4,14 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import at.borkowski.spicej.impl.SimulationTickSource;
+import at.borkowski.spicej.streams.util.PipedInputStream;
+import at.borkowski.spicej.streams.util.PipedOutputStream;
 
 public class DelayedInputStreamTest {
 

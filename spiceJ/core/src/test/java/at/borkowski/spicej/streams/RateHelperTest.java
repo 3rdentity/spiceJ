@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import at.borkowski.spicej.impl.SimulationTickSource;
-import at.borkowski.spicej.streams.RateHelper;
 import at.borkowski.spicej.streams.RateHelper.IdleNotify;
 
 public class RateHelperTest {

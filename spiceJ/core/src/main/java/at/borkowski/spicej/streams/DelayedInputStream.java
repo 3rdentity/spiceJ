@@ -8,28 +8,39 @@ import java.util.Map;
 import java.util.Queue;
 
 import at.borkowski.spicej.WouldBlockException;
-import at.borkowski.spicej.impl.SimulationTickSource;
+import at.borkowski.spicej.impl.SleepWakeup;
 import at.borkowski.spicej.ticks.TickListener;
+import at.borkowski.spicej.ticks.TickSource;
 
 public class DelayedInputStream extends InputStream implements TickListener {
 
    private final InputStream in;
-   private final int delay;
+   private final long delay;
    private final byte[] buffer;
 
+   private boolean blocking = true;
    private long currentTick;
 
-   private int currentVirtualEnd = 0;
-   private int start = 0, end = 0;
+   private volatile int currentVirtualEnd = 0;
+   private volatile int start = 0;
+   private volatile int end = 0;
    private Queue<Long> tickMarks = new LinkedList<>();
    private Map<Long, Integer> tick_virtualEnd = new HashMap<>();
 
-   public DelayedInputStream(SimulationTickSource t, InputStream in, int delay, int bufferSize) {
-      t.addListener(this);
+   private SleepWakeup sleep = new SleepWakeup();
+   private Object lock = new Object();
 
+   public DelayedInputStream(TickSource t, InputStream in, long delay, int bufferSize) {
       this.in = in;
       this.delay = delay;
-      this.buffer = new byte[bufferSize];
+
+      // +1 is necessary because we handle start == end as an empty
+      // pipe and not, as it could be, as a full one (= we need at
+      // least one empty byte to work). in order to fulfill the buffer
+      // size, we increase the buffer size by one
+      this.buffer = new byte[bufferSize + 1];
+
+      t.addListener(this);
    }
 
    @Override
@@ -37,14 +48,24 @@ public class DelayedInputStream extends InputStream implements TickListener {
       if (delay == 0)
          handleNewData();
 
-      if (bufferedBytes(currentVirtualEnd) == 0)
-         throw new WouldBlockException();
+      waitForAvailable();
 
-      byte b = buffer[start++];
-      if (start >= buffer.length)
-         start -= buffer.length;
+      synchronized (lock) {
+         byte b = buffer[start++];
+         if (start >= buffer.length)
+            start -= buffer.length;
+         return b & 0xFF;
+      }
 
-      return b & 0xFF;
+   }
+
+   private void waitForAvailable() {
+      while (bufferedBytes(currentVirtualEnd) == 0) {
+         if (!blocking)
+            throw new WouldBlockException();
+         else
+            sleep.sleep();
+      }
    }
 
    @Override
@@ -58,13 +79,12 @@ public class DelayedInputStream extends InputStream implements TickListener {
       if (delay == 0)
          handleNewData();
 
+      waitForAvailable();
       int readable = bufferedBytes(currentVirtualEnd);
-      if (readable == 0)
-         throw new WouldBlockException();
 
       int ret;
       int toRead = ret = Math.min(len, readable);
-      if (start > currentVirtualEnd) {
+      if (start + toRead > buffer.length) {
          int chunk1 = buffer.length - start;
          System.arraycopy(buffer, start, b, off, chunk1);
          toRead -= chunk1;
@@ -72,10 +92,12 @@ public class DelayedInputStream extends InputStream implements TickListener {
          start = 0;
       }
       System.arraycopy(buffer, start, b, off, toRead);
-      start += toRead;
-      if (start >= buffer.length)
-         start -= buffer.length;
-      
+      synchronized (lock) {
+         start += toRead;
+         if (start >= buffer.length)
+            start -= buffer.length;
+      }
+
       return ret;
    }
 
@@ -98,7 +120,7 @@ public class DelayedInputStream extends InputStream implements TickListener {
    }
 
    int freeBytes() {
-      return buffer.length - bufferedBytes();
+      return buffer.length - bufferedBytes() - 1;
    }
 
    @Override
@@ -126,16 +148,19 @@ public class DelayedInputStream extends InputStream implements TickListener {
                if (rd == -1)
                   break; // TODO: handle stream closing
                toRead -= rd;
-               end += rd;
-               if (end >= buffer.length)
-                  end -= buffer.length;
+               synchronized (lock) {
+                  end += rd;
+                  if (end >= buffer.length)
+                     end -= buffer.length;
+                  if (end != previousEnd && delay > 0) {
+                     tick_virtualEnd.put(currentTick + delay - 1, end);
+                     tickMarks.add(currentTick + delay - 1);
+                  }
+               }
             }
          }
 
-         if (end != previousEnd && delay > 0) {
-            tick_virtualEnd.put(currentTick + delay - 1, end);
-            tickMarks.add(currentTick + delay - 1);
-         }
+         sleep.wakeup();
       } catch (IOException e) {
          // TODO handle exceptions
          throw new RuntimeException(e);

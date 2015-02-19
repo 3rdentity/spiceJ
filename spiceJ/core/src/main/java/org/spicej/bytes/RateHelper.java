@@ -2,6 +2,7 @@ package org.spicej.bytes;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.spicej.WouldBlockException;
 import org.spicej.impl.SleepWakeup;
 import org.spicej.ticks.TickListener;
 import org.spicej.ticks.TickSource;

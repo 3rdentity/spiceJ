@@ -47,6 +47,43 @@ public class DelayedInputStream extends InputStream implements TickListener {
       return b & 0xFF;
    }
 
+   @Override
+   public void close() throws IOException {
+      in.close();
+      // TODO better handling of closed streams
+   }
+
+   @Override
+   public int read(byte[] b, int off, int len) throws IOException {
+      if (delay == 0)
+         handleNewData();
+
+      int readable = bufferedBytes(currentVirtualEnd);
+      if (readable == 0)
+         throw new WouldBlockException();
+
+      int ret;
+      int toRead = ret = Math.min(len, readable);
+      if (start > currentVirtualEnd) {
+         int chunk1 = buffer.length - start;
+         System.arraycopy(buffer, start, b, off, chunk1);
+         toRead -= chunk1;
+         off += chunk1;
+         start = 0;
+      }
+      System.arraycopy(buffer, start, b, off, toRead);
+      start += toRead;
+      if (start >= buffer.length)
+         start -= buffer.length;
+      
+      return ret;
+   }
+
+   @Override
+   public int read(byte[] b) throws IOException {
+      return read(b, 0, b.length);
+   }
+
    int bufferedBytes() {
       return bufferedBytes(end);
    }

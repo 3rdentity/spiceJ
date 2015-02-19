@@ -3,9 +3,9 @@ package at.borkowski.spicej.streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import at.borkowski.spicej.WouldBlockException;
 import at.borkowski.spicej.impl.SleepWakeup;
@@ -24,7 +24,7 @@ public class DelayedInputStream extends InputStream implements TickListener {
    private volatile int currentVirtualEnd = 0;
    private volatile int start = 0;
    private volatile int end = 0;
-   private Queue<Long> tickMarks = new LinkedList<>();
+   private SortedSet<Long> tickMarks = new TreeSet<Long>();
    private Map<Long, Integer> tick_virtualEnd = new HashMap<>();
 
    private SleepWakeup sleep = new SleepWakeup();
@@ -166,8 +166,11 @@ public class DelayedInputStream extends InputStream implements TickListener {
          throw new RuntimeException(e);
       }
 
-      while (!tickMarks.isEmpty() && tickMarks.peek() <= currentTick)
-         currentVirtualEnd = tick_virtualEnd.remove(tickMarks.poll());
+      while (!tickMarks.isEmpty() && tickMarks.first() <= currentTick) {
+         Long tick = tickMarks.first();
+         tickMarks.remove(tick);
+         currentVirtualEnd = tick_virtualEnd.remove(tick);
+      }
 
       if (tickMarks.isEmpty())
          currentVirtualEnd = end;

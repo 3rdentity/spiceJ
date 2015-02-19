@@ -65,69 +65,70 @@ public class DelayInputStreamTests {
 
    private static void performMeasurement(long nanoseconds) throws IOException {
       PipedInputStream pis = new PipedInputStream();
-      PipedOutputStream pos = new PipedOutputStream(pis);
+      try (PipedOutputStream pos = new PipedOutputStream(pis)) {
 
-      Result result = DelayCalculator.calculate(nanoseconds);
-      RealTimeTickSource t = new RealTimeTickSource(result.getTickNanosecondsInterval());
-      final DelayedInputStream dis = Streams.addDelay(pis, t, result.getDelay(), BUFFER);
+         Result result = DelayCalculator.calculate(nanoseconds);
+         RealTimeTickSource t = new RealTimeTickSource(result.getTickNanosecondsInterval());
+         final DelayedInputStream dis = Streams.addDelay(pis, t, result.getDelay(), BUFFER);
 
-      Thread reader = new Thread(new Runnable() {
-         @Override
-         public void run() {
-            try {
-               for (int i = 0; i < blocks.length; i++) {
-                  read[i] = new byte[blocks[i].length];
-                  int done = 0;
-                  while (done < blocks[i].length) {
-                     allRead = false;
-                     int rd = dis.read(read[i], done, blocks[i].length - done);
-                     done += rd;
+         Thread reader = new Thread(new Runnable() {
+            @Override
+            public void run() {
+               try {
+                  for (int i = 0; i < blocks.length; i++) {
+                     read[i] = new byte[blocks[i].length];
+                     int done = 0;
+                     while (done < blocks[i].length) {
+                        allRead = false;
+                        int rd = dis.read(read[i], done, blocks[i].length - done);
+                        done += rd;
+                     }
+                     timestamps_1[i] = System.nanoTime();
                   }
-                  timestamps_1[i] = System.nanoTime();
+                  allRead = true;
+               } catch (IOException e) {
+                  throw new RuntimeException(e);
                }
-               allRead = true;
-            } catch (IOException e) {
-               throw new RuntimeException(e);
             }
+         });
+
+         long sleepNs = nanoseconds * 2 / 3;
+         long sleepMs = sleepNs / 1000000;
+         int sleepNsInt = (int) (sleepNs % 1000000);
+
+         allRead = true;
+         reader.start();
+         while (allRead)
+            SleepWakeup.sleep(10);
+
+         for (int i = 0; i < blocks.length; i++) {
+            pos.write(blocks[i]);
+            timestamps_0[i] = System.nanoTime();
+            try {
+               Thread.sleep(sleepMs, sleepNsInt);
+            } catch (InterruptedException ignore) {}
          }
-      });
 
-      long sleepNs = nanoseconds * 2 / 3;
-      long sleepMs = sleepNs / 1000000;
-      int sleepNsInt = (int) (sleepNs % 1000000);
+         while (!allRead)
+            SleepWakeup.sleep(10);
 
-      allRead = true;
-      reader.start();
-      while (allRead)
-         SleepWakeup.sleep(10);
+         t.stop();
 
-      for (int i = 0; i < blocks.length; i++) {
-         pos.write(blocks[i]);
-         timestamps_0[i] = System.nanoTime();
-         try {
-            Thread.sleep(sleepMs, sleepNsInt);
-         } catch (InterruptedException ignore) {}
+         long sum = 0;
+         for (int i = 0; i < blocks.length; i++) {
+            sum += (timestamps_1[i] - timestamps_0[i]);
+            assertArrayEquals(blocks[i], read[i]);
+         }
+         long interval = sum / blocks.length;
+         double error = ((double) interval / nanoseconds - 1) * 100;
+
+         System.out.printf("delay ");
+         format(nanoseconds);
+         System.out.printf(" avg ");
+         format((long) interval);
+         System.out.printf(" err %6.2f %%", error);
+         System.out.println();
       }
-
-      while (!allRead)
-         SleepWakeup.sleep(10);
-
-      t.stop();
-
-      long sum = 0;
-      for (int i = 0; i < blocks.length; i++) {
-         sum += (timestamps_1[i] - timestamps_0[i]);
-         assertArrayEquals(blocks[i], read[i]);
-      }
-      long interval = sum / blocks.length;
-      double error = ((double) interval / nanoseconds - 1) * 100;
-
-      System.out.printf("delay ");
-      format(nanoseconds);
-      System.out.printf(" avg ");
-      format((long) interval);
-      System.out.printf(" err %6.2f %%", error);
-      System.out.println();
    }
 
    private static void format(long nanoseconds) {

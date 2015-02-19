@@ -17,9 +17,9 @@ public class SleepWakeup {
 
    /**
     * Blocks the calling thread until another thread calls this object's
-    * {@link #wakeup()}.
+    * {@link #wakeup()} or a certain timeout passes. This method can be used in
+    * a loop or similar environment to avoid CPU over-utilization.
     */
-   // TODO javadoc is wrong
    public void sleep() {
       synchronized (lock) {
          try {

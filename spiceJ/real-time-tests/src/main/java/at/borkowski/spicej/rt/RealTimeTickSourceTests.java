@@ -22,6 +22,14 @@ import at.borkowski.spicej.ticks.TickListener;
  * criteria, they are not classified as regular (unit) tests in the classical
  * meaning, and are not executed automatically upon builds.
  * 
+ * This class first determines the rough minimal interval value in nanoseconds
+ * the running platform is able to generate. It then starts generating ticks
+ * with intervals starting at this value. For each interval, a series of trials
+ * is started, and the average error in percent is reported.
+ * 
+ * Finally, the lowest reliably generateable interval is reported. This can be
+ * used as a measure for (real-time) system performance.
+ * 
  * <ul>
  * <li>They don't have a binary yes/no result since they measure system
  * performance</li>
@@ -90,9 +98,9 @@ public class RealTimeTickSourceTests {
 
       if (minReliable != null)
          if (reliability > 3) {
-            System.out.println("Lowest reliably generateable interval is " + minReliable + " ms");
+            System.out.println("Lowest reliably generateable interval is " + minReliable + " ns");
          } else {
-            System.out.println("Lowest reliably generateable interval is " + minReliable + "ms, but not enough consecutive measurements have been found (only " + reliability + ")");
+            System.out.println("Lowest reliably generateable interval is " + minReliable + " ns, but not enough consecutive measurements have been found (only " + reliability + ")");
          }
       else
          System.out.println("No reliable measurement was possible");
@@ -110,7 +118,7 @@ public class RealTimeTickSourceTests {
          System.out.println("Could not evaluate minium interval (no valid measurements)");
       } else {
          minBound = Math.min(500, min * 3 / 4);
-         System.out.println("Minmal interval: " + min + " ns, selecting " + minBound + " ms");
+         System.out.println("Minmal interval: " + min + " ns, selecting " + minBound + " ns");
       }
 
    }

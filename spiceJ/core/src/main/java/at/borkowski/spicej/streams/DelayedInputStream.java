@@ -12,6 +12,16 @@ import at.borkowski.spicej.impl.SleepWakeup;
 import at.borkowski.spicej.ticks.TickListener;
 import at.borkowski.spicej.ticks.TickSource;
 
+/**
+ * Provides an {@link InputStream} instance with a delay in the transferred
+ * bytes.
+ * 
+ * The stream uses a {@link TickSource} as a source of timing information and
+ * delays the reception of data by a certain number of ticks.
+ *
+ */
+// TODO implement output stream
+// TODO implement some kind of DelayShaper (analogous to RateShaper)
 public class DelayedInputStream extends InputStream implements TickListener {
 
    private final InputStream in;
@@ -30,6 +40,24 @@ public class DelayedInputStream extends InputStream implements TickListener {
    private SleepWakeup sleep = new SleepWakeup();
    private Object lock = new Object();
 
+   /**
+    * Constructs a new {@link DelayedInputStream} with the given parameters.
+    * 
+    * @param t
+    *           The tick source to use
+    * @param in
+    *           The underlying {@link InputStream} to read data from
+    * @param delay
+    *           The delay (in ticks) to introduce to data
+    * @param bufferSize
+    *           The buffer size to use. The implementation has to store read
+    *           bytes in an intermediate buffer. The buffer must be large enough
+    *           to store the data. Note that data which cannot be stored into
+    *           the buffer because of its overflow will have a higher delay,
+    *           which is why the buffer should be significantly higher than the
+    *           expected data arrivel rate (times the expected interval of
+    *           reading from this stream).
+    */
    public DelayedInputStream(TickSource t, InputStream in, long delay, int bufferSize) {
       this.in = in;
       this.delay = delay;
@@ -136,7 +164,7 @@ public class DelayedInputStream extends InputStream implements TickListener {
       return bufferedBytes(currentVirtualEnd);
    }
 
-   void handleNewData() {
+   private void handleNewData() {
       try {
          int previousEnd = end;
 

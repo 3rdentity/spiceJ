@@ -14,6 +14,23 @@ import at.borkowski.spicej.streams.DelayedInputStream;
 import at.borkowski.spicej.streams.util.PipedInputStream;
 import at.borkowski.spicej.streams.util.PipedOutputStream;
 
+/**
+ * This class performs a real-time test of {@link DelayedInputStream}.
+ * 
+ * The test measures the actualy real-time delay introduced by
+ * {@link DelayedInputStream} and verifies it against the provided value. This
+ * is done for several orders of magnitude. The error is given in percent.
+ * 
+ * The theoretical lower bound for delays is the performance of
+ * {@link RealTimeTickSource} (see {@link RealTimeTickSourceTests}).
+ * 
+ * For very low values (< 10000 ns), the error is high because the overhead
+ * involved into the generation of the delay is higher than the delay itself.
+ * 
+ * The error can be influenced by changing the epsilon value of
+ * {@link DelayCalculator}.
+ * 
+ */
 public class DelayInputStreamTests {
 
    private static final int BUFFER = 100 * 1024;

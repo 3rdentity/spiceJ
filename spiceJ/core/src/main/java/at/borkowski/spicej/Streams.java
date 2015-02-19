@@ -54,12 +54,30 @@ public class Streams {
     *           (see
     *           {@link RateLimitOutputStream#RateLimitOutputStream(OutputStream, TickSource, int, int)}
     *           )
-    * @return the resulting input stream
+    * @return the resulting output stream
     */
    public static RateLimitOutputStream limitRate(OutputStream base, TickSource tickSource, int bytesPerTick, int prescaler) {
       return new RateLimitOutputStream(base, tickSource, bytesPerTick, prescaler);
    }
 
+   /**
+    * Creates a delayed {@link InputStream}. See
+    * {@link DelayedInputStream#DelayedInputStream(TickSource, InputStream, long, int)}
+    * for detailed information.
+    * 
+    * @param base
+    *           The raw (underlying) {@link InputStream}.
+    * @param tickSource
+    *           The source of ticks
+    * @param delay
+    *           The delay in ticks to add to the stream
+    * @param bufferSize
+    *           The buffer size to use (see
+    *           {@link DelayedInputStream#DelayedInputStream(TickSource, InputStream, long, int)}
+    *           )
+    * @return the resulting input stream
+    */
+   // TODO test this
    public static DelayedInputStream addDelay(InputStream base, TickSource tickSource, long delay, int bufferSize) {
       return new DelayedInputStream(tickSource, base, delay, bufferSize);
    }

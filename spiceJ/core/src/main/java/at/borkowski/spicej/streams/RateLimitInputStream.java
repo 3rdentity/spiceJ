@@ -3,6 +3,7 @@ package at.borkowski.spicej.streams;
 import java.io.IOException;
 import java.io.InputStream;
 
+import at.borkowski.spicej.WouldBlockException;
 import at.borkowski.spicej.shapers.RateShaper;
 import at.borkowski.spicej.streams.RateHelper.IdleNotify;
 import at.borkowski.spicej.ticks.TickSource;
@@ -10,8 +11,13 @@ import at.borkowski.spicej.ticks.TickSource;
 /**
  * Provides an {@link InputStream} with a limited rate of bytes.
  * 
- * A stream has two modes: boring and non-boring. The boring flag modifies he
- * behavior of {@link #read(byte[], int, int)} and {@link #read(byte[])}.
+ * A stream has two blocking modes: blocking and non-blocking. If the stream is
+ * in non-blocking mode, any call that would cause the stream to block (ie. all
+ * read calls when no data is available) throw a {@link WouldBlockException}.
+ * 
+ * A stream has two boring modes: boring and non-boring. The boring flag
+ * modifies he behavior of {@link #read(byte[], int, int)} and
+ * {@link #read(byte[])}.
  * 
  * According to {@link InputStream}, they method read between 1 and n bytes,
  * where n is the size of the effective buffer.
@@ -181,11 +187,21 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
     * Sets the boring flag.
     * 
     * @param boring
+    *           whether the stream should be in boring mode (see
+    *           {@link #RateLimitInputStream(InputStream, TickSource, int, int)}
+    *           ).
     */
    public void setBoring(boolean boring) {
       this.boring = boring;
    }
 
+   /**
+    * Sets the non-blocking flag.
+    * 
+    * @param nonBlocking
+    *           whether the stream should be in non-blocking mode (see
+    *           {@link RateLimitInputStream}).
+    */
    public void setNonBlocking(boolean nonBlocking) {
       rateHelper.setNonBlocking(nonBlocking);
    }

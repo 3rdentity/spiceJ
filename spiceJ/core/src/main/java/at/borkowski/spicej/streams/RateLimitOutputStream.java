@@ -8,7 +8,8 @@ import at.borkowski.spicej.streams.RateHelper.IdleNotify;
 import at.borkowski.spicej.ticks.TickSource;
 
 /**
- * Provides an {@link OutputStream} with a limited rate of bytes.
+ * Provides an {@link OutputStream} with a limited rate of bytes. For a
+ * description of blocking mode, see {@link RateLimitInputStream}.
  */
 public class RateLimitOutputStream extends OutputStream implements RateShaper {
    private final OutputStream real;
@@ -70,12 +71,19 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
       real.flush();
    }
 
-   public void setNonBlocking(boolean nonBlocking) {
-      rateHelper.setNonBlocking(nonBlocking);
-   }
-
    void test__SetIdleNotify(IdleNotify target) {
       rateHelper.test__SetIdleNotify(target);
+   }
+
+   /**
+    * Sets the non-blocking flag.
+    * 
+    * @param nonBlocking
+    *           whether the stream should be in non-blocking mode (see
+    *           {@link RateLimitInputStream}).
+    */
+   public void setNonBlocking(boolean nonBlocking) {
+      rateHelper.setNonBlocking(nonBlocking);
    }
 
 }

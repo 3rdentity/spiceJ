@@ -7,6 +7,7 @@ import java.io.OutputStream;
  * A stream gobbler, copying data from an {@link InputStream} to an
  * {@link OutputStream}.
  */
+// TODO test this
 public class StreamGobbler implements Runnable {
    private final InputStream is;
    private final OutputStream os;

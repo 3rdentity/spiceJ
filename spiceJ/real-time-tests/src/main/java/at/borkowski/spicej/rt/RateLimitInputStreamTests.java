@@ -29,6 +29,14 @@ import at.borkowski.spicej.streams.util.PipedOutputStream;
  * performance tests in a way that good/bad status is reported. It merely runs
  * several throughput measurement tests using {@link RateLimitInputStream} and
  * reports the errors.
+ * 
+ * Very low byte rates are simulated with a higher time (5 s, 2 s, 1 s and so
+ * on) and thus need a longer time to run. Lower byte rates allow shorter
+ * execution times.
+ * 
+ * The upper bound is the executing hardware, as high byte rates require high
+ * interval rates and buffer sizes. Rates above 1 GB/s usually have a high error
+ * rate.
  *
  * You can use this class to find out the upper bound of throughput (minus the
  * overhead introduced by {@link RateLimitInputStream}) of your system.

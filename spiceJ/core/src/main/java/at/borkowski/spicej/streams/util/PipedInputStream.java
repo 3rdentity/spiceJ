@@ -1,3 +1,4 @@
+// @formatter:off
 /*
  * THIS FILE IS TAKEN FROM THE ORACLE (JDK7) SOURCE
  * 

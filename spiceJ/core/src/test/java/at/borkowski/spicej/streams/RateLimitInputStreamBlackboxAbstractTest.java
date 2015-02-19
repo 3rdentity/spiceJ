@@ -35,7 +35,7 @@ public abstract class RateLimitInputStreamBlackboxAbstractTest {
          }
 
       });
-      
+
       t.advance(); // enter t = 0
 
       for (int i = 0; i < getPrescaler(); i++) {

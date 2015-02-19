@@ -23,7 +23,7 @@ class RateHelper {
    private SleepWakeup sleep = new SleepWakeup();
    private int timewiseAvailable;
    private boolean nonBlockng = false;
-   
+
    private IdleNotify test__IdleNotify;
 
    /**

@@ -11,7 +11,7 @@ import at.borkowski.spicej.ticks.TickSource;
 public class OutputStreamWriteRecorder extends OutputStream {
 
    private final TickSource t;
-   
+
    private long t0;
 
    private long[] recording;

@@ -93,7 +93,7 @@ public class RateCalculatorTest {
       evaluate(rate, RateCalculator.calculate(rate, 10 * 1000000));
       evaluate(rate, RateCalculator.calculate(rate, 1 * 1000000));
    }
-   
+
    private void evaluate(float rate, Result r) {
       BigDecimal actualRate_ = new BigDecimal(RateCalculator.NS_PER_S);
       actualRate_ = actualRate_.multiply(new BigDecimal(r.getBytesPerTick()));

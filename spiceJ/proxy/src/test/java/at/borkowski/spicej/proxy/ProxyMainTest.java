@@ -74,7 +74,7 @@ public class ProxyMainTest {
       assertEquals(8080, res.localPort);
       assertEquals(1235, res.remotePort);
       assertEquals("target", res.remoteHost);
-      
+
       res = ProxyMain.processCommand("--rate-send", "10", "8080:target:1235");
       assertEquals(10F, res.rateUp, DELTA);
       assertEquals(null, res.rateDown);
@@ -91,7 +91,7 @@ public class ProxyMainTest {
       assertEquals(8080, res.localPort);
       assertEquals(1235, res.remotePort);
       assertEquals("target", res.remoteHost);
-      
+
       res = ProxyMain.processCommand("--rate-receive", "13", "8080:target:1235");
       assertEquals(null, res.rateUp);
       assertEquals(13F, res.rateDown, DELTA);

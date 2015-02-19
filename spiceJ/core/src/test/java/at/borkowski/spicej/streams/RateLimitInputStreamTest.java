@@ -76,7 +76,7 @@ public class RateLimitInputStreamTest {
       assertEquals(10, sut.available());
 
       assertEquals(3, sut.read(buffer, 0, 3));
-      
+
       assertEquals(7, sut.available());
    }
 
@@ -194,36 +194,36 @@ public class RateLimitInputStreamTest {
    @Test
    public void testVariableByteRate() throws IOException {
       autoAdvance = false;
-      
+
       assertEquals(3, sut.read(buffer, 0, 3));
       assertEquals(7, sut.available());
-      
+
       sut.setByteRate(8);
       assertEquals(5, sut.available());
-      
+
       sut.setByteRate(5);
       assertEquals(2, sut.available());
-      
+
       sut.setByteRate(1); // -2
       assertEquals(0, sut.available());
-      
+
       t.advance(); // -1
       assertEquals(0, sut.available());
-      
+
       t.advance(); // 0
       assertEquals(0, sut.available());
-      
+
       t.advance();
       assertEquals(1, sut.available());
-      
+
       t.advance();
       assertEquals(1, sut.available());
-      
+
       sut.setByteRate(10);
-      
+
       assertEquals(3, sut.read(buffer, 0, 3));
       assertEquals(7, sut.available());
-      
+
       sut.setByteRate(14);
       assertEquals(11, sut.available());
    }

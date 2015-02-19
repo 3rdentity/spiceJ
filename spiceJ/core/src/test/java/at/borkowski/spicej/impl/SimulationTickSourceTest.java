@@ -53,7 +53,7 @@ public class SimulationTickSourceTest {
       assertEquals(3, sut.getCurrentTick());
       verify(listenerA).tick(3);
       verify(listenerB).tick(3);
-      
+
       sut.removeListener(listenerA);
 
       sut.advance();

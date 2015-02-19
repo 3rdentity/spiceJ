@@ -5,7 +5,7 @@ spiceJ is a network traffic shaping tool written in Java.
 Its goal is the simulation of a few network properties:
 
 1. Limited Bandwidth
-1. Additional Latency (**not yet implemented**)
+1. Additional Latency
 
 All properties allow for jitter (**not yet implemented**), and are dynamic (ie. can change during simulation time).
 

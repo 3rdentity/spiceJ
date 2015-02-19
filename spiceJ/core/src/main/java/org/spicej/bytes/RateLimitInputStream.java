@@ -173,20 +173,6 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
    /**
     * Testability function only. See {@link RateHelper}.
     */
-   void test__EnableFailOnHang() {
-      rateHelper.test__EnableFailOnHang();
-   }
-
-   /**
-    * Testability function only. See {@link RateHelper}.
-    */
-   void test__DisableFailOnHang() {
-      rateHelper.test__DisableFailOnHang();
-   }
-
-   /**
-    * Testability function only. See {@link RateHelper}.
-    */
    void test__SetIdleNotify(IdleNotify target) {
       rateHelper.test__SetIdleNotify(target);
    }
@@ -198,6 +184,10 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
     */
    public void setBoring(boolean boring) {
       this.boring = boring;
+   }
+
+   public void setNonBlocking(boolean nonBlocking) {
+      rateHelper.setNonBlocking(nonBlocking);
    }
 
 }

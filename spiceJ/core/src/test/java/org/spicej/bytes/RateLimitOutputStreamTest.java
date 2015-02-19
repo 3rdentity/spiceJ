@@ -22,7 +22,7 @@ public class RateLimitOutputStreamTest {
    public void setUp() throws Exception {
       t = new SimulationTickSource();
       sut = new RateLimitOutputStream(new ByteArrayOutputStream(250), t, 10, 1);
-      sut.test__EnableFailOnHang();
+      sut.setNonBlocking(true);
       sut.test__SetIdleNotify(new IdleNotify() {
 
          @Override

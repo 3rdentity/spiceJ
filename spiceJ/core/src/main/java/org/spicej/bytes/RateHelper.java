@@ -21,8 +21,8 @@ class RateHelper {
    private AtomicInteger spent = new AtomicInteger();
    private SleepWakeup sleep = new SleepWakeup();
    private int timewiseAvailable;
-
-   private boolean test__FailOnHang;
+   private boolean nonBlockng = false;
+   
    private IdleNotify test__IdleNotify;
 
    /**
@@ -131,27 +131,10 @@ class RateHelper {
    private void sleep() {
       if (test__IdleNotify != null && test__IdleNotify.idle())
          return;
-      if (test__FailOnHang)
-         throw new AssertionError("should not hang");
+      if (nonBlockng)
+         throw new WouldBlockException();
 
       sleep.sleep();
-   }
-
-   /**
-    * Testability method: enables that any call to {@link #take(int)} or
-    * {@link #takeOne()} fails if waiting (blocking) would occur. This is
-    * necessary to prevent blocking in unit tests.
-    */
-   void test__EnableFailOnHang() {
-      test__FailOnHang = true;
-   }
-
-   /**
-    * Testability method: disables that any call to {@link #take(int)} or
-    * {@link #takeOne()} fails if waiting (blocking) would occur.
-    */
-   void test__DisableFailOnHang() {
-      test__FailOnHang = false;
    }
 
    /**
@@ -206,6 +189,10 @@ class RateHelper {
        *         otherwise.
        */
       boolean idle();
+   }
+
+   public void setNonBlocking(boolean nonBlocking) {
+      this.nonBlockng = nonBlocking;
    }
 
 }

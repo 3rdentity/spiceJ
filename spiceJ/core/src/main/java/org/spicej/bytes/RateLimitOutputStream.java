@@ -70,12 +70,8 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
       real.flush();
    }
 
-   void test__EnableFailOnHang() {
-      rateHelper.test__EnableFailOnHang();
-   }
-
-   void test__DisableFailOnHang() {
-      rateHelper.test__DisableFailOnHang();
+   public void setNonBlocking(boolean nonBlocking) {
+      rateHelper.setNonBlocking(nonBlocking);
    }
 
    void test__SetIdleNotify(IdleNotify target) {

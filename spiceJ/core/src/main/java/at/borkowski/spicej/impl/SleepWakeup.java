@@ -41,7 +41,7 @@ public class SleepWakeup {
       while (System.currentTimeMillis() < deadline) {
          try {
             Thread.sleep(Math.max(1, (deadline - System.currentTimeMillis()) / 2));
-         } catch (InterruptedException _) {}
+         } catch (InterruptedException ignore) {}
       }
    }
 }

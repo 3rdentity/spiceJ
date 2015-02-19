@@ -159,10 +159,6 @@
       <id>ossrh</id>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
-    <!-- <repository>
-      <id>porto-ssh</id>
-      <url>scpexe://porto.borkowski.at/var/www/www-maven/docroot/repo</url>
-    </repository> -->
   </distributionManagement>
 
   <dependencies>

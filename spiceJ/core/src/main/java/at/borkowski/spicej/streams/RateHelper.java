@@ -1,4 +1,4 @@
-package at.borkowski.spicej.bytes;
+package at.borkowski.spicej.streams;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

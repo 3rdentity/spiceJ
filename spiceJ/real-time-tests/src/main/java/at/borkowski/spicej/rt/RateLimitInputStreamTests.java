@@ -5,10 +5,10 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
 import at.borkowski.spicej.Streams;
-import at.borkowski.spicej.bytes.RateLimitInputStream;
 import at.borkowski.spicej.impl.RealTimeTickSource;
 import at.borkowski.spicej.proxy.RateCalculator;
 import at.borkowski.spicej.proxy.RateCalculator.Result;
+import at.borkowski.spicej.streams.RateLimitInputStream;
 
 /*
  * UGLY CODE

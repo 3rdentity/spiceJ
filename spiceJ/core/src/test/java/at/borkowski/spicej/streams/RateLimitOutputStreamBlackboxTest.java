@@ -1,13 +1,13 @@
-package at.borkowski.spicej.bytes;
+package at.borkowski.spicej.streams;
 
 import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import at.borkowski.spicej.bytes.RateLimitOutputStream;
-import at.borkowski.spicej.bytes.RateHelper.IdleNotify;
 import at.borkowski.spicej.impl.SimulationTickSource;
+import at.borkowski.spicej.streams.RateLimitOutputStream;
+import at.borkowski.spicej.streams.RateHelper.IdleNotify;
 import at.borkowski.spicej.testutil.OutputStreamWriteRecorder;
 
 public class RateLimitOutputStreamBlackboxTest {

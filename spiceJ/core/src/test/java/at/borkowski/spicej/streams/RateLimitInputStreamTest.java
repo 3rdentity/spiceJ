@@ -1,4 +1,4 @@
-package at.borkowski.spicej.bytes;
+package at.borkowski.spicej.streams;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -10,9 +10,9 @@ import java.io.PipedOutputStream;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.borkowski.spicej.bytes.RateLimitInputStream;
-import at.borkowski.spicej.bytes.RateHelper.IdleNotify;
 import at.borkowski.spicej.impl.SimulationTickSource;
+import at.borkowski.spicej.streams.RateLimitInputStream;
+import at.borkowski.spicej.streams.RateHelper.IdleNotify;
 
 public class RateLimitInputStreamTest {
 

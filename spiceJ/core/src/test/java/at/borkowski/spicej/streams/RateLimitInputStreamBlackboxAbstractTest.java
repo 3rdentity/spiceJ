@@ -1,4 +1,4 @@
-package at.borkowski.spicej.bytes;
+package at.borkowski.spicej.streams;
 
 import java.io.IOException;
 import java.io.PipedInputStream;
@@ -7,9 +7,9 @@ import java.io.PipedOutputStream;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.borkowski.spicej.bytes.RateLimitInputStream;
-import at.borkowski.spicej.bytes.RateHelper.IdleNotify;
 import at.borkowski.spicej.impl.SimulationTickSource;
+import at.borkowski.spicej.streams.RateLimitInputStream;
+import at.borkowski.spicej.streams.RateHelper.IdleNotify;
 import at.borkowski.spicej.testutil.InputStreamReaderRecorder;
 
 public abstract class RateLimitInputStreamBlackboxAbstractTest {

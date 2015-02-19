@@ -1,10 +1,10 @@
-package at.borkowski.spicej.bytes;
+package at.borkowski.spicej.streams;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import at.borkowski.spicej.bytes.RateHelper.IdleNotify;
 import at.borkowski.spicej.shapers.RateShaper;
+import at.borkowski.spicej.streams.RateHelper.IdleNotify;
 import at.borkowski.spicej.ticks.TickSource;
 
 /**

@@ -3,8 +3,8 @@ package at.borkowski.spicej;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import at.borkowski.spicej.bytes.RateLimitInputStream;
-import at.borkowski.spicej.bytes.RateLimitOutputStream;
+import at.borkowski.spicej.streams.RateLimitInputStream;
+import at.borkowski.spicej.streams.RateLimitOutputStream;
 import at.borkowski.spicej.ticks.TickSource;
 
 /**

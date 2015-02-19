@@ -1,27 +1,29 @@
-package at.borkowski.spicej.bytes;
+package at.borkowski.spicej.streams;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import at.borkowski.spicej.bytes.RateHelper;
-import at.borkowski.spicej.bytes.RateHelper.IdleNotify;
 import at.borkowski.spicej.impl.SimulationTickSource;
+import at.borkowski.spicej.streams.RateLimitOutputStream;
+import at.borkowski.spicej.streams.RateHelper.IdleNotify;
 
-public class RateHelperTest {
+public class RateLimitOutputStreamTest {
 
-   private RateHelper sut;
+   private RateLimitOutputStream sut;
    private SimulationTickSource t;
+   private byte[] buffer = new byte[500];
    private boolean autoAdvance = true;
    private long t0;
 
    @Before
    public void setUp() throws Exception {
       t = new SimulationTickSource();
-      sut = new RateHelper(t, 10, 1);
+      sut = new RateLimitOutputStream(new ByteArrayOutputStream(250), t, 10, 1);
       sut.setNonBlocking(true);
       sut.test__SetIdleNotify(new IdleNotify() {
 
@@ -41,44 +43,26 @@ public class RateHelperTest {
    }
 
    @Test
-   public void testTakeOne() throws IOException {
-      sut.take(1);
-      assertEquals(t0, t.getCurrentTick());
-   }
-
-   @Test
-   public void testTakeOneTick() throws IOException {
-      sut.take(9);
-      assertEquals(t0, t.getCurrentTick());
-      sut.takeOne();
-      assertEquals(t0, t.getCurrentTick());
-      sut.takeOne();
-      assertEquals(t0 + 1, t.getCurrentTick());
-   }
-
-   @Test
    public void testSufficient() throws IOException {
-      sut.take(3);
+      sut.write(buffer, 0, 3);
       assertEquals(t0, t.getCurrentTick());
    }
 
    @Test
    public void testInsufficient1extra() throws IOException {
-      int rd = sut.take(13);
-      assertEquals(10, rd);
-      assertEquals(t0, t.getCurrentTick());
+      sut.write(buffer, 0, 13);
+      assertEquals(t0 + 1, t.getCurrentTick());
    }
 
    @Test
    public void testInsufficient3extra() throws IOException {
-      int rd = sut.take(33);
-      assertEquals(10, rd);
-      assertEquals(t0, t.getCurrentTick());
+      sut.write(buffer, 0, 33);
+      assertEquals(t0 + 3, t.getCurrentTick());
    }
 
    private void singlewrite(int count) throws IOException {
       for (int i = 0; i < count; i++)
-         sut.takeOne();
+         sut.write(0);
    }
 
    @Test

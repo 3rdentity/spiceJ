@@ -38,7 +38,6 @@ public class SocketProxy implements Runnable {
     * @param rateDown
     *           the downstream rate limitation to establish, or
     *           <code>null</code> for no limit
-    * @throws IOException
     */
    public SocketProxy(int localPort, String remoteHost, int remotePort, Float rateUp, Float rateDown) {
       this.localPort = localPort;
@@ -56,6 +55,13 @@ public class SocketProxy implements Runnable {
       return Streams.limitRate(inputStream, new RealTimeTickSource(calculation.getTickNanosecondInterval(), true), calculation.getBytesPerTick(), calculation.getPrescale());
    }
 
+   /**
+    * Initializes the proxy provider. This method must be called before the
+    * actual use and is required for testability reasons.
+    * 
+    * @throws IOException
+    *            If the initialization fails.
+    */
    public void initialize() throws IOException {
       if (listener != null)
          throw new IllegalStateException("already initialized");

@@ -51,8 +51,10 @@ public class DelayCalculator {
     * details.
     * 
     * @param nanoseconds
+    *           The required delay in nanoseconds
     * @param epsilon
-    * @return
+    *           The permitted error (0 &lt; epsilon &lt; 1)
+    * @return The calculation result
     */
    public static Result calculate(long nanoseconds, float epsilon) {
       if (epsilon <= 0 || epsilon >= 1)

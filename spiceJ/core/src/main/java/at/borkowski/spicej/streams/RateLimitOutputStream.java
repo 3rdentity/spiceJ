@@ -21,6 +21,15 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
     * Constructs a byte-rate-limited {@link OutputStream}. See
     * {@link RateLimitInputStream} for a description of the rate parameters
     * (byteRate and prescale).
+    * 
+    * @param real
+    *           The raw {@link OutputStream} to send to
+    * @param tickSource
+    *           The tick source to use
+    * @param byteRate
+    *           The rate in bytes per tick (before prescaler) to use
+    * @param prescale
+    *           The prescaler to use (see {@link RateLimitInputStream})
     */
    public RateLimitOutputStream(OutputStream real, TickSource tickSource, int byteRate, int prescale) {
       this.real = real;

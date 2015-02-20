@@ -24,7 +24,7 @@ import at.borkowski.spicej.streams.util.PipedOutputStream;
  * The theoretical lower bound for delays is the performance of
  * {@link RealTimeTickSource} (see {@link RealTimeTickSourceTests}).
  * 
- * For very low values (< 10000 ns), the error is high because the overhead
+ * For very low values (&lt; 10000 ns), the error is high because the overhead
  * involved into the generation of the delay is higher than the delay itself.
  * 
  * The error can be influenced by changing the epsilon value of

@@ -112,13 +112,13 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
     * <li>In boring mode, the stream blocks until all bytes actually available
     * from the underlying InputStream (reported by
     * {@link InputStream#available()}) have been read, even if this means
-    * waiting for the next tick.
+    * waiting for the next tick.</li>
     * <li>In non-boring mode, the stream does not block for the first byte's
     * subsequent bytes. This means that if a rate limitation is in place (ie.
     * the rate has been reached for the current tick), this method does not
     * attempt to read the bytes (the number of actually read bytes is returned
-    * conforming with {@link InputStream#read(byte[], int, int)}.
-    * <ul>
+    * conforming with {@link InputStream#read(byte[], int, int)}.</li>
+    * </ul>
     */
    @Override
    public int read(byte[] b, int off, int len) throws IOException {

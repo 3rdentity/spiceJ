@@ -92,6 +92,7 @@ public class RateCalculator {
     * {@link #MIN_INTERVAL_NS}). See {@link RateCalculator} for details.
     * 
     * @param rateBytesPerSecond
+    *           The rate in bytes per second to target
     * @return the calculation result
     */
    public static Result calculate(float rateBytesPerSecond) {
@@ -103,6 +104,7 @@ public class RateCalculator {
     * {@link RateCalculator} for details.
     * 
     * @param rateBytesPerSecond
+    *           The rate in bytes per second to target
     * @param minInterval
     *           The minimal interval in nanoseconds.
     * @return the calculation result

@@ -34,7 +34,7 @@ public class SleepWakeup {
     * Sleeps for the provided amount of milliseconds, ignoring thread
     * interrupts.
     * 
-    * @param ms
+    * @param ms how many milliseconds to sleep
     */
    public static void sleep(int ms) {
       long deadline = System.currentTimeMillis() + ms;

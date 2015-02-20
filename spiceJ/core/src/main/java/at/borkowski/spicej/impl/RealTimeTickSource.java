@@ -83,6 +83,7 @@ public class RealTimeTickSource extends AbstractTickSource {
     * active.
     * 
     * @param keepAlive
+    *           whether the keepAlive mode should be on
     */
    public void setKeepAlive(boolean keepAlive) {
       this.keepAlive = keepAlive;

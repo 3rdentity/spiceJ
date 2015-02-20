@@ -15,6 +15,7 @@ public interface TickSource {
     * Adds a listener to fire TICK events to.
     * 
     * @param listener
+    *           the listener to add
     */
    void addListener(TickListener listener);
 
@@ -22,11 +23,14 @@ public interface TickSource {
     * Removes a TICK listener.
     * 
     * @param listener
+    *           the listener to remove
     */
    void removeListener(TickListener listener);
 
    /**
     * Returns the current tick.
+    * 
+    * @return the current tick
     */
    long getCurrentTick();
 }

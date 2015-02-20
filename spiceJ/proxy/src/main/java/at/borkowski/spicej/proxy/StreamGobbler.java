@@ -50,7 +50,7 @@ public class StreamGobbler implements Runnable {
     * Waits until the gobbler finished. If the gobbler encountered any
     * exception, it is thrown from this method.
     * 
-    * @throws Throwable
+    * @throws Throwable if the gobbler has thrown an exception
     */
    public void waitFor() throws Throwable {
       while (!finished) {

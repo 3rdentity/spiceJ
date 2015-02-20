@@ -1,5 +1,7 @@
 # spiceJ
 
+[![Build Status](https://travis-ci.org/michael-borkowski/spiceJ.svg?branch=master)](https://travis-ci.org/michael-borkowski/spiceJ)
+
 spiceJ is a network traffic shaping tool written in Java.
 
 Its goal is the simulation of a few network properties:
@@ -97,6 +99,3 @@ spiceJ is developed by Michael Borkowski.
 
 spiceJ is licensed under the [MIT License](http://opensource.org/licenses/MIT).
 
-## Build Status
-
-[![Build Status](https://travis-ci.org/michael-borkowski/spiceJ.svg?branch=master)](https://travis-ci.org/michael-borkowski/spiceJ)

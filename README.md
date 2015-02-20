@@ -97,3 +97,6 @@ spiceJ is developed by Michael Borkowski.
 
 spiceJ is licensed under the [MIT License](http://opensource.org/licenses/MIT).
 
+## Build Status
+
+[![Build Status](https://travis-ci.org/michael-borkowski/spiceJ.svg?branch=master)](https://travis-ci.org/michael-borkowski/spiceJ)

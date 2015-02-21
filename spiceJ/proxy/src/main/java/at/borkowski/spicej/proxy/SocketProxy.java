@@ -40,13 +40,15 @@ public class SocketProxy implements Runnable {
     * @param rateUp
     *           the upstream rate limitation to establish, or <code>null</code>
     *           for no limit
-    * @param delayReceive
-    *           the delay to add to the uplink stream
-    * @param delaySend
-    *           the delay to add to the downlink stream
     * @param rateDown
     *           the downstream rate limitation to establish, or
     *           <code>null</code> for no limit
+    * @param delayUp
+    *           the delay to add to the uplink stream, or <code>null</code> for
+    *           no delay
+    * @param delayDown
+    *           the delay to add to the downlink stream, or <code>null</code>
+    *           for no delay
     */
    public SocketProxy(int localPort, String remoteHost, int remotePort, Float rateUp, Float rateDown, Float delayUp, Float delayDown) {
       this.localPort = localPort;

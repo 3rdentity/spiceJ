@@ -178,7 +178,7 @@ public class RateCalculator {
          return prescale;
       }
 
-      public int getTickNanosecondInterval() {
+      public int getTickNanosecondsInterval() {
          return tickNanosecondInterval;
       }
    }

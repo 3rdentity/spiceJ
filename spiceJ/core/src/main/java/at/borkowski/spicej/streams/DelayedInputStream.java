@@ -9,6 +9,7 @@ import java.util.TreeSet;
 
 import at.borkowski.spicej.WouldBlockException;
 import at.borkowski.spicej.impl.SleepWakeup;
+import at.borkowski.spicej.shapers.DelayShaper;
 import at.borkowski.spicej.ticks.TickListener;
 import at.borkowski.spicej.ticks.TickSource;
 
@@ -21,11 +22,10 @@ import at.borkowski.spicej.ticks.TickSource;
  *
  */
 // TODO implement output stream
-// TODO implement some kind of DelayShaper (analogous to RateShaper)
-public class DelayedInputStream extends InputStream implements TickListener {
+public class DelayedInputStream extends InputStream implements TickListener, DelayShaper {
 
    private final InputStream in;
-   private final long delay;
+   private long delay;
    private final byte[] buffer;
 
    private boolean blocking = true;
@@ -202,6 +202,11 @@ public class DelayedInputStream extends InputStream implements TickListener {
 
       if (tickMarks.isEmpty())
          currentVirtualEnd = end;
+   }
+
+   @Override
+   public void setByteRate(long delay) {
+      this.delay = delay;
    }
 
 }

@@ -97,7 +97,7 @@ public class RateLimitInputStreamTests {
       try (final PipedOutputStream pos = new PipedOutputStream(pis)) {
 
          Result result = RateCalculator.calculate((float) bytesPerSecond, 1 * 1000000);
-         RealTimeTickSource t = new RealTimeTickSource(result.getTickNanosecondInterval(), true);
+         RealTimeTickSource t = new RealTimeTickSource(result.getTickNanosecondsInterval(), true);
          RateLimitInputStream sut = Streams.limitRate(pis, t, result.getBytesPerTick(), result.getPrescale());
 
          final int currentSequence = ++sequence;

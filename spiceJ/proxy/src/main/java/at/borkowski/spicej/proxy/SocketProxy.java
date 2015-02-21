@@ -19,9 +19,14 @@ import at.borkowski.spicej.proxy.RateCalculator.Result;
 public class SocketProxy implements Runnable {
    final int localPort, remotePort;
    final String remoteHost;
-   final Float rateUp, rateDown;
+   final Float rateUp, rateDown, delayUp, delayDown;
 
    private ServerSocket listener;
+
+   /**
+    * The buffer size used for socket connections if delaying is added.
+    */
+   public static final int BUFFER_SIZE = 100 * 1024;
 
    /**
     * Creates a proxy and binds to the local port.
@@ -35,16 +40,30 @@ public class SocketProxy implements Runnable {
     * @param rateUp
     *           the upstream rate limitation to establish, or <code>null</code>
     *           for no limit
+    * @param delayReceive
+    *           the delay to add to the uplink stream
+    * @param delaySend
+    *           the delay to add to the downlink stream
     * @param rateDown
     *           the downstream rate limitation to establish, or
     *           <code>null</code> for no limit
     */
-   public SocketProxy(int localPort, String remoteHost, int remotePort, Float rateUp, Float rateDown) {
+   public SocketProxy(int localPort, String remoteHost, int remotePort, Float rateUp, Float rateDown, Float delayUp, Float delayDown) {
       this.localPort = localPort;
       this.remoteHost = remoteHost;
       this.remotePort = remotePort;
       this.rateUp = rateUp;
       this.rateDown = rateDown;
+      this.delayUp = delayUp;
+      this.delayDown = delayDown;
+   }
+
+   private static InputStream delay(InputStream inputStream, Float delay) {
+      if (delay == null || delay * 1000000 < 1)
+         return inputStream;
+
+      DelayCalculator.Result calculation = DelayCalculator.calculate((long) (1000000D * delay));
+      return Streams.addDelay(inputStream, new RealTimeTickSource(calculation.getTickNanosecondsInterval(), true), calculation.getDelay(), BUFFER_SIZE);
    }
 
    private static InputStream rate(InputStream inputStream, Float rate) {
@@ -52,7 +71,7 @@ public class SocketProxy implements Runnable {
          return inputStream;
 
       Result calculation = RateCalculator.calculate(rate);
-      return Streams.limitRate(inputStream, new RealTimeTickSource(calculation.getTickNanosecondInterval(), true), calculation.getBytesPerTick(), calculation.getPrescale());
+      return Streams.limitRate(inputStream, new RealTimeTickSource(calculation.getTickNanosecondsInterval(), true), calculation.getBytesPerTick(), calculation.getPrescale());
    }
 
    /**
@@ -102,8 +121,8 @@ public class SocketProxy implements Runnable {
       public void run() {
          StreamGobbler a = null, b = null;
          try {
-            a = new StreamGobbler(rate(client.getInputStream(), rateUp), server.getOutputStream());
-            b = new StreamGobbler(rate(server.getInputStream(), rateDown), client.getOutputStream());
+            a = new StreamGobbler(delay(rate(client.getInputStream(), rateUp), delayUp), server.getOutputStream());
+            b = new StreamGobbler(delay(rate(server.getInputStream(), rateDown), delayDown), client.getOutputStream());
 
             Thread t = new Thread(a);
             t.setDaemon(true);

@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
+// TODO test this
 public class ProxyMain {
    private static boolean printUsage = true;
    private static boolean printCommandLineErrors = true;
@@ -57,6 +58,18 @@ public class ProxyMain {
          commandLine.rateReceive = commandLine.rateSend = commandLine.rate;
       }
 
+      if (commandLine.delay != null) {
+         if (commandLine.delayReceive != null) {
+            err("You can't use --delay and --delay-receive at the same time");
+            return null;
+         }
+         if (commandLine.delaySend != null) {
+            err("You can't use --delay and --delay-send at the same time");
+            return null;
+         }
+         commandLine.delayReceive = commandLine.delaySend = commandLine.delay;
+      }
+
       if (commandLine.proxyDescription.size() != 1) {
          err("Exactly one proxy description required in the form of localPort:[remoteHost:]remotePort");
          return null;
@@ -76,7 +89,7 @@ public class ProxyMain {
          remoteHost = split[1];
 
       SocketProxy sp;
-      sp = new SocketProxy(localPort, remoteHost, remotePort, commandLine.rateSend, commandLine.rateReceive);
+      sp = new SocketProxy(localPort, remoteHost, remotePort, commandLine.rateSend, commandLine.rateReceive, commandLine.delayReceive, commandLine.delaySend);
 
       return sp;
    }

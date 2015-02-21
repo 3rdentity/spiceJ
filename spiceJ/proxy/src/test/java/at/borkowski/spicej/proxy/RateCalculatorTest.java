@@ -98,7 +98,7 @@ public class RateCalculatorTest {
       BigDecimal actualRate_ = new BigDecimal(RateCalculator.NS_PER_S);
       actualRate_ = actualRate_.multiply(new BigDecimal(r.getBytesPerTick()));
       actualRate_ = actualRate_.divide(new BigDecimal(r.getPrescale()), SCALE, RoundingMode.HALF_UP);
-      actualRate_ = actualRate_.divide(new BigDecimal(r.getTickNanosecondInterval()), SCALE, RoundingMode.HALF_UP);
+      actualRate_ = actualRate_.divide(new BigDecimal(r.getTickNanosecondsInterval()), SCALE, RoundingMode.HALF_UP);
 
       if (actualRate_.compareTo(new BigDecimal(0)) == 0)
          fail("rate is 0");

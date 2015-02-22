@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/michael-borkowski/spiceJ.svg?branch=master)](https://travis-ci.org/michael-borkowski/spiceJ)
 
-spiceJ is a network traffic shaping tool written in Java.
+spiceJ is a network traffic shaping library and tool written in Java.
 
 Its goal is the simulation of a few network properties:
 
@@ -11,7 +11,7 @@ Its goal is the simulation of a few network properties:
 
 All properties allow for jitter (**not yet implemented**), and are dynamic (ie. can change during simulation time).
 
-spiceJ aims to support reproducible outcomes, meaning that a simulation is purely deterministic and contains no random elements. To achieve completely reproducible simulation, use `SimulationTickSource` instead of `RealTimeTickSource`.
+spiceJ aims to support reproducible outcomes by being independent of its clock source. In other words, using a controllable clock source (see `SimulationTickSource`) a deterministic outcome can be achieved. On the other hand, if the goal is to shape network in real time, `RealTimeTickSource` can be used to clock the shaping components, resulting in a live traffic shaping.
 
 spiceJ consists of Java Proxy Objects of InputStream and OutputStream, hiding the original stream and adding the desired properties. Furthermore, spiceJ offers wrappers for creating a transparent (stand-alone) TCP proxy, allowing users to simulate network shaping using any client application.
 

@@ -21,7 +21,6 @@ import at.borkowski.spicej.ticks.TickSource;
  * delays the reception of data by a certain number of ticks.
  *
  */
-// TODO implement output stream
 public class DelayedInputStream extends InputStream implements TickListener, DelayShaper {
 
    private final InputStream real;
@@ -60,8 +59,8 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
     *           expected data arrivel rate (times the expected interval of
     *           reading from this stream).
     */
-   public DelayedInputStream(TickSource t, InputStream in, long delay, int bufferSize) {
-      this.real = in;
+   public DelayedInputStream(TickSource t, InputStream real, long delay, int bufferSize) {
+      this.real = real;
       this.t = t;
       this.delay = delay;
 

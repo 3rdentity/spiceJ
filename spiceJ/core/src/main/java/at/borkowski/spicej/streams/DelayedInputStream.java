@@ -21,7 +21,7 @@ import at.borkowski.spicej.ticks.TickSource;
  * delays the reception of data by a certain number of ticks.
  *
  */
-public class DelayedInputStream extends InputStream implements TickListener, DelayShaper {
+public class DelayedInputStream extends InputStream implements TickListener, DelayShaper, Runnable {
 
    private final InputStream real;
    private final TickSource t;
@@ -29,6 +29,7 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
    private final byte[] buffer;
 
    private boolean blocking = true, eof = false, closed = false;
+   private boolean eofDetection = false;
    private long currentTick;
 
    private volatile int currentAvailableEnd = 0;
@@ -38,25 +39,46 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
    private SortedSet<Long> tickMarks = new TreeSet<Long>();
    private Map<Long, Integer> tick_virtualEnd = new HashMap<>();
 
-   private SleepWakeup sleep = new SleepWakeup();
+   private SleepWakeup sleepForTick = new SleepWakeup();
+
+   private Thread eofDetector;
+
+   // object to lock on for setting (!) eofDetectorBlock and eofDetectorActive
+   private Object eofDetectorLock = new Object();
+
+   // if eof detector is running and reading
+   volatile boolean eofDetectorActive = false;
+
+   // if eof detector is shortly before read()
+   private volatile boolean eofDetectorReady = false;
+
+   // result from eofDetector's read(): eofDetectorThrowable or eofDetectorResult
+   // eof detector will always seteofDetectorInput to:
+   //   >=0 if read normally
+   //    -1 if eof
+   //    -2 if throwable caught
+   //    -3 if no result yet (set before thread start)
+   private volatile int eofDetectorResult = -3;
+   private volatile Throwable eofDetectorThrowable = null;
 
    /**
     * Constructs a new {@link DelayedInputStream} with the given parameters.
     * 
     * @param t
-    *           The tick source to use
+    *           the tick source to use
     * @param real
-    *           The underlying {@link InputStream} to read data from
+    *           the underlying {@link InputStream} to read data from
     * @param delay
-    *           The delay (real ticks) to introduce to data
+    *           the delay (real ticks) to introduce to data
     * @param bufferSize
-    *           The buffer size to use. The implementation has to store read
+    *           the buffer size to use. The implementation has to store read
     *           bytes real an intermediate buffer. The buffer must be large
     *           enough to store the data. Note that data which cannot be stored
     *           into the buffer because of its overflow will have a higher
     *           delay, which is why the buffer should be significantly higher
     *           than the expected data arrivel rate (times the expected interval
     *           of reading from this stream).
+    * @param useEofDetection
     */
    public DelayedInputStream(TickSource t, InputStream real, long delay, int bufferSize) {
       this.real = real;
@@ -72,15 +94,39 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
       t.addListener(this);
    }
 
+   private void ensureRunningEofDetector() {
+      if (eofDetectorActive || !eofDetection)
+         return;
+      synchronized (eofDetectorLock) {
+         if (eofDetectorActive)
+            return;
+         eofDetectorActive = true;
+      }
+      eofDetector = new Thread(this, "EOF Detector for " + this);
+      eofDetector.setDaemon(true);
+      eofDetector.start();
+      while (!eofDetectorReady)
+         ;
+      eofDetectorReady = false;
+   }
+
+   private int getEofResult() {
+      int result = -3;
+      if (!eofDetectorActive)
+         result = eofDetectorResult;
+      eofDetectorResult = -3;
+      return result;
+   }
+
    @Override
    public int read() throws IOException {
-      if (eof)
-         return -1;
-
       checkNotClosed();
 
       if (delay == 0)
          handleNewData();
+
+      if (eof)
+         return -1;
 
       waitForAvailable();
 
@@ -101,7 +147,27 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
          if (!blocking)
             throw new WouldBlockException();
          else
-            sleep.sleep();
+            sleepForTick.sleep();
+      }
+   }
+
+   @Override
+   public void run() {
+      try {
+         synchronized (eofDetectorLock) {
+            try {
+               eofDetectorReady = true;
+               int result = real.read();
+               eofDetectorResult = result;
+            } catch (Throwable t) {
+               eofDetectorResult = -2;
+               eofDetectorThrowable = t;
+            }
+         }
+      } finally {
+         synchronized (eofDetectorLock) {
+            eofDetectorActive = false;
+         }
       }
    }
 
@@ -176,10 +242,10 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
       checkNotClosed();
       if (eof)
          return 0;
-      
+
       if (delay == 0)
          handleNewData();
-      
+
       return bufferedBytes(currentAvailableEnd);
    }
 
@@ -187,7 +253,26 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
       try {
          int previousEnd = end;
 
-         if (real.available() > 0 && freeBytes() > 0) {
+         int eofResult = getEofResult();
+         boolean noFurtherAction = false;
+
+         if (eofResult == -2) {
+            throw new RuntimeException(eofDetectorThrowable);
+         } else if (eofResult == -1) {
+            eof = true;
+         } else if (eofResult >= 0) {
+            if (freeBytes() <= 0) {
+               // push it back
+               eofDetectorResult = eofResult;
+               noFurtherAction = true;
+            } else {
+               buffer[end] = (byte) eofResult;
+               if (++end >= buffer.length)
+                  end -= buffer.length;
+            }
+         }
+
+         if (!noFurtherAction && !eofDetectorActive && (!eof && (real.available() > 0)) && freeBytes() > 0) {
             int toRead = Math.min(freeBytes(), real.available());
             int rd;
             while (toRead > 0) {
@@ -198,16 +283,19 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
                end += rd;
                if (end >= buffer.length)
                   end -= buffer.length;
-               if (end != previousEnd && delay > 0) {
-                  // -1 is necessary because we read data one tick later than it actually arrived
-                  // (we assume to receive the tick after the phase generating the data)
-                  tick_virtualEnd.put(currentTick + delay - 1, end);
-                  tickMarks.add(currentTick + delay - 1);
-               }
             }
+         } else if ((!eof && (real.available() == 0)) && freeBytes() > 0) {
+            ensureRunningEofDetector();
          }
 
-         sleep.wakeup();
+         if (end != previousEnd && delay > 0) {
+            // -1 is necessary because we read data one tick later than it actually arrived
+            // (we assume to receive the tick after the phase generating the data)
+            tick_virtualEnd.put(currentTick + delay - 1, end);
+            tickMarks.add(currentTick + delay - 1);
+         }
+
+         sleepForTick.wakeup();
       } catch (IOException e) {
          // TODO handle exceptions
          throw new RuntimeException(e);
@@ -269,6 +357,36 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
     */
    public void setNonBlocking(boolean nonBlocking) {
       blocking = !nonBlocking;
+   }
+
+   /**
+    * Testability method only: waits for finished EOF detector
+    */
+   void __waitForEofDetector() {
+      while (eofDetectorActive)
+         ;
+   }
+
+   /**
+    * Sets whether this {@link DelayedInputStream} should employ EOF detection.
+    * If this flag is set to <code>true</code>, this stream starts showing
+    * non-deterministic behavior (in general), since a new thread is spawned for
+    * continuous EOF detection which might or might not wake up before a certain
+    * tick to report a new byte.
+    * 
+    * Without EOF detection, EOF is not reported to the caller at all.
+    * 
+    * If this flag is set to <code>false</code> while an EOF detector thread is
+    * running, the thread might finish at some undefined point in future, ie.
+    * setting this flag to false only prevents new EOF detector threads from
+    * spawning.
+    * 
+    * @param eofDetection
+    *           if EOF detection should be employed (impllies non-deterministisc
+    *           behavior)
+    */
+   public void setEofDetection(boolean eofDetection) {
+      this.eofDetection = eofDetection;
    }
 
 }

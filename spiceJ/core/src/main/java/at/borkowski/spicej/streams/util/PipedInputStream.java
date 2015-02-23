@@ -3,8 +3,11 @@
  * THIS FILE IS TAKEN FROM THE ORACLE (JDK7) SOURCE
  * 
  *   This file is a very light adaption of the Oracle JDK 7 implementation of PipedInputStream.
- *   The only modification (expect for package names and the removed JavaDoc) is the introduction
- *   of a "waiting" boolean flag and two calls to notifyAll() (in read() and read(byte[], int, int).
+ *   The modifications are:
+ *     - package names 
+ *     - removed JavaDoc
+ *     - two calls to notifyAll() (in read() and read(byte[], int, int)
+ *     - removal of the reader/writer alive detection mechanism (error prone and performance lowering)
  *
  *   According to [1], the JDK source code is distributed under GNU GPL v2, which permits redistribution
  *   and modification.
@@ -46,14 +49,6 @@ public class PipedInputStream extends InputStream {
     boolean closedByWriter = false;
     volatile boolean closedByReader = false;
     boolean connected = false;
-    boolean waiting = false;
-
-        /* REMIND: identification of the read and write sides needs to be
-           more sophisticated.  Either using thread groups (but what about
-           pipes within a thread?) or using finalization (but it may be a
-           long time until the next GC). */
-    Thread readSide;
-    Thread writeSide;
 
     private static final int DEFAULT_PIPE_SIZE = 1024;
 
@@ -99,7 +94,6 @@ public class PipedInputStream extends InputStream {
 
     protected synchronized void receive(int b) throws IOException {
         checkStateForReceive();
-        writeSide = Thread.currentThread();
         if (in == out)
             awaitSpace();
         if (in < 0) {
@@ -114,7 +108,6 @@ public class PipedInputStream extends InputStream {
 
     synchronized void receive(byte b[], int off, int len)  throws IOException {
         checkStateForReceive();
-        writeSide = Thread.currentThread();
         int bytesToTransfer = len;
         while (bytesToTransfer > 0) {
             if (in == out)
@@ -141,6 +134,7 @@ public class PipedInputStream extends InputStream {
                 in = 0;
             }
         }
+        notifyAll();
     }
 
     private void checkStateForReceive() throws IOException {
@@ -148,8 +142,6 @@ public class PipedInputStream extends InputStream {
             throw new IOException("Pipe not connected");
         } else if (closedByWriter || closedByReader) {
             throw new IOException("Pipe closed");
-        } else if (readSide != null && !readSide.isAlive()) {
-            throw new IOException("Read end dead");
         }
     }
 
@@ -160,7 +152,6 @@ public class PipedInputStream extends InputStream {
             /* full: kick any waiting readers */
             notifyAll();
             try {
-                waiting = true;
                 wait(1000);
             } catch (InterruptedException ex) {
                 throw new java.io.InterruptedIOException();
@@ -171,7 +162,6 @@ public class PipedInputStream extends InputStream {
     synchronized void receivedLast() {
         closedByWriter = true;
         notifyAll();
-        waiting = false;
     }
 
     public synchronized int read()  throws IOException {
@@ -179,25 +169,16 @@ public class PipedInputStream extends InputStream {
             throw new IOException("Pipe not connected");
         } else if (closedByReader) {
             throw new IOException("Pipe closed");
-        } else if (writeSide != null && !writeSide.isAlive()
-                   && !closedByWriter && (in < 0)) {
-            throw new IOException("Write end dead");
         }
 
-        readSide = Thread.currentThread();
-        int trials = 2;
         while (in < 0) {
             if (closedByWriter) {
                 /* closed by writer, return EOF */
                 return -1;
             }
-            if ((writeSide != null) && (!writeSide.isAlive()) && (--trials < 0)) {
-                throw new IOException("Pipe broken");
-            }
             /* might be a writer waiting */
             notifyAll();
             try {
-                waiting = true;
                 wait(1000);
             } catch (InterruptedException ex) {
                 throw new java.io.InterruptedIOException();
@@ -211,9 +192,7 @@ public class PipedInputStream extends InputStream {
             /* now empty */
             in = -1;
         }
-        if(waiting)
             notifyAll();
-        waiting = false;
 
         return ret;
     }
@@ -261,9 +240,7 @@ public class PipedInputStream extends InputStream {
                 in = -1;
             }
         }
-        if(waiting)
            notifyAll();
-        waiting = false;
         return rlen;
     }
 

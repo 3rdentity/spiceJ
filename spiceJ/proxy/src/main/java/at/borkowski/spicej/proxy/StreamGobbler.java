@@ -1,5 +1,6 @@
 package at.borkowski.spicej.proxy;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -7,7 +8,6 @@ import java.io.OutputStream;
  * A stream gobbler, copying data from an {@link InputStream} to an
  * {@link OutputStream}.
  */
-// TODO test this
 public class StreamGobbler implements Runnable {
    private final InputStream is;
    private final OutputStream os;
@@ -33,12 +33,16 @@ public class StreamGobbler implements Runnable {
             os.write(block, 0, rd);
             os.flush();
          }
-
-         os.close();
-         is.close();
       } catch (Throwable t) {
          this.t = t;
       } finally {
+         try {
+            os.close();
+         } catch (IOException ignore) {}
+         try {
+            is.close();
+         } catch (IOException ignore) {}
+
          finished = true;
          synchronized (this) {
             this.notifyAll();
@@ -50,7 +54,8 @@ public class StreamGobbler implements Runnable {
     * Waits until the gobbler finished. If the gobbler encountered any
     * exception, it is thrown from this method.
     * 
-    * @throws Throwable if the gobbler has thrown an exception
+    * @throws Throwable
+    *            if the gobbler has thrown an exception
     */
    public void waitFor() throws Throwable {
       while (!finished) {

@@ -7,7 +7,12 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 jar=$(find "$DIR" -regextype posix-egrep -regex '.*proxy-[0-9]+.[0-9]+.[0-9]+(-SNAPSHOT)?-jar-with-dependencies.jar')
 
 if [ -z "$jar" ]; then
-	echo "Could not find target JAR" >&2
+	echo "Could not find target JAR - did you compile the project?" >&2
+	echo "To compile, issue:" >&2
+	echo >&2
+	echo "    cd spiceJ" >&2
+	echo "    mvn package" >&2
+	echo >&2
 	exit 1;
 fi
 

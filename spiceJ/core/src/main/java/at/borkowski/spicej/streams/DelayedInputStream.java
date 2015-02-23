@@ -78,7 +78,6 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
     *           delay, which is why the buffer should be significantly higher
     *           than the expected data arrivel rate (times the expected interval
     *           of reading from this stream).
-    * @param useEofDetection
     */
    public DelayedInputStream(TickSource t, InputStream real, long delay, int bufferSize) {
       this.real = real;

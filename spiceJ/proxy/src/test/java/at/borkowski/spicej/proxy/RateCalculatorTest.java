@@ -20,15 +20,12 @@ public class RateCalculatorTest {
    public void setUp() throws Exception {}
 
    @Test
-   public void testMinimumByterate() {
-      // one of the lowest byterates possible to generate with our data model
-      test(RateCalculator.MIN_RATE);
-   }
-
-   @Test
-   public void testMaximumByterate() {
-      // one of the highest byterates possible to generate with our data model
-      test(RateCalculator.MAX_RATE);
+   public void testAllByterates() {
+      for (int scale = -9; scale < 9; scale++) {
+         for (int factor = 0; factor < 10; factor++) {
+            test((float) (Math.pow(10, scale) * (1 + factor)));
+         }
+      }
    }
 
    @Test
@@ -88,27 +85,40 @@ public class RateCalculatorTest {
    }
 
    private void test(float rate) {
-      evaluate(rate, RateCalculator.calculate(rate));
-      evaluate(rate, RateCalculator.calculate(rate, 50 * 1000000));
-      evaluate(rate, RateCalculator.calculate(rate, 10 * 1000000));
-      evaluate(rate, RateCalculator.calculate(rate, 1 * 1000000));
+      evaluate(rate, RateCalculator.calculate(rate), RateCalculator.MIN_INTERVAL_NS);
+      evaluate(rate, RateCalculator.calculate(rate, 50 * 1000000), 50 * 1000000);
+      evaluate(rate, RateCalculator.calculate(rate, 10 * 1000000), 10 * 1000000);
+      evaluate(rate, RateCalculator.calculate(rate, 1 * 1000000), 10 * 1000000);
    }
 
-   private void evaluate(float rate, Result r) {
+   private void evaluate(float rate, Result r, long minInterval) {
       BigDecimal actualRate_ = new BigDecimal(RateCalculator.NS_PER_S);
       actualRate_ = actualRate_.multiply(new BigDecimal(r.getBytesPerTick()));
       actualRate_ = actualRate_.divide(new BigDecimal(r.getPrescale()), SCALE, RoundingMode.HALF_UP);
       actualRate_ = actualRate_.divide(new BigDecimal(r.getTickNanosecondsInterval()), SCALE, RoundingMode.HALF_UP);
 
       if (actualRate_.compareTo(new BigDecimal(0)) == 0)
-         fail("rate is 0");
+         fail("rate is 0 for input " + rate);
 
       double actualRate = actualRate_.doubleValue();
       double error = actualRate / rate - 1;
 
-      if (error > MAX_ERROR) {
+      if (Math.abs(error) > MAX_ERROR) {
          System.out.println(rate + " | " + actualRate + " | " + (double) Math.round(error * 10000) / 100 + "%");
          fail("error too high for byte rate " + rate + " (error: " + error + " > " + MAX_ERROR + ")");
       }
+
+      if (r.getBytesPerTick() < 1)
+         fail("bytes per tick < 1 (" + r.getBytesPerTick() + ") for rate " + rate);
+      if (r.getBytesPerTick() > RateCalculator.MAX_BYTES_PER_TICK)
+         fail("bytes per tick > max (" + r.getBytesPerTick() + " > " + RateCalculator.MAX_BYTES_PER_TICK + ") for rate " + rate);
+
+      if (r.getPrescale() < 1)
+         fail("prescale < 1 (" + r.getPrescale() + ") for rate " + rate);
+
+      if (r.getTickNanosecondsInterval() < minInterval)
+         fail("interval < min (" + r.getTickNanosecondsInterval() + " < " + minInterval + ") for rate " + rate);
+      if (r.getBytesPerTick() > RateCalculator.MAX_INTERVAL_NS)
+         fail("interval > max (" + r.getTickNanosecondsInterval() + " > " + RateCalculator.MAX_INTERVAL_NS + ") for rate " + rate);
    }
 }

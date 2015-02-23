@@ -39,11 +39,11 @@ To start spiceJ in stand-alone TCP proxy mode, use the executable jar built from
 
 To start a TCP proxy with a given rate limit of bytes per second, use the following command:
 
-    $ spicej-proxy -r <byterate> <local-port>:<remote-host>
+    $ spicej-proxy -r <byterate> <local-port>:<remote-host>:<remote-port>
 
 You can also specify different upstream and downstream rates:
 
-    $ spicej-proxy -l <local-port> -h <remote-host> -p <remote-port> -a <upstream> -b <donwstream>
+    $ spicej-proxy -a <upstream> -b <donwstream> <local-port>:<remote-host>:<remote-port>
 
 spiceJ creates a proxy listening on port `<local-port>` which connects to `<remote-host>:<remote-port>` whenever an inbound connection is accepted. It then relays data in both directions while respecting the upstream and downstream rates.
 

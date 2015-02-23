@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# A simple runner script for easy starting of the proxy
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+jar=$(find "$DIR" -regextype posix-egrep -regex '.*proxy-[0-9]+.[0-9]+.[0-9]+(-SNAPSHOT)?-jar-with-dependencies.jar')
+
+if [ -z "$jar" ]; then
+	echo "Could not find target JAR" >&2
+	exit 1;
+fi
+
+java -jar "$jar" "$@"

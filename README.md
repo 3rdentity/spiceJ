@@ -35,15 +35,15 @@ To use spiceJ as a library, take a look at the `Streams` class, it contains help
 
 To start spiceJ in stand-alone TCP proxy mode, use the executable jar built from the `proxy` project. To get usage info, issue `--help`:
 
-    $ java -jar path/to/proxy.jar -help
+    $ spicej-proxy -help
 
 To start a TCP proxy with a given rate limit of bytes per second, use the following command:
 
-    $ java -jar path/to/proxy.jar -l <local-port> -h <remote-host> -p <remote-port> -r <byterate>
+    $ spicej-proxy -r <byterate> <local-port>:<remote-host>
 
 You can also specify different upstream and downstream rates:
 
-    $ java -jar path/to/proxy.jar -l <local-port> -h <remote-host> -p <remote-port> -a <upstream> -b <donwstream>
+    $ spicej-proxy -l <local-port> -h <remote-host> -p <remote-port> -a <upstream> -b <donwstream>
 
 spiceJ creates a proxy listening on port `<local-port>` which connects to `<remote-host>:<remote-port>` whenever an inbound connection is accepted. It then relays data in both directions while respecting the upstream and downstream rates.
 
@@ -57,13 +57,13 @@ In terminal 1 (listening terminal), launch:
 
     $ nc -vvvlp 1235 | pv > /dev/null
 
-In terminal 2 (proxy), launch one of the following::
+In terminal 2 (proxy), launch one of the following (`localhost` is the implicit default):
 
-    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 1000      # for    1 kB/s =    0.97 kiB
-    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 10000     # for   10 kB/s =    9.76 kiB
-    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 100000    # for  100 kB/s =   97.65 kiB
-    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 1000000   # for    1 MB/s =  976.56 kiB = 0.95 MiB 
-    $ java -jar path/to/proxy.jar -l 1234 -p 1235 -r 10000000  # for   10 MB/s = 9765.62 MiB = 9.53 MiB
+    $ spicej-proxy -r 1000      1234:1235 # for    1 kB/s =    0.97 kiB
+    $ spicej-proxy -r 10000     1234:1235 # for   10 kB/s =    9.76 kiB
+    $ spicej-proxy -r 100000    1234:1235 # for  100 kB/s =   97.65 kiB
+    $ spicej-proxy -r 1000000   1234:1235 # for    1 MB/s =  976.56 kiB = 0.95 MiB 
+    $ spicej-proxy -r 10000000  1234:1235 # for   10 MB/s = 9765.62 MiB = 9.53 MiB
 
 Finally, in terminal 3 (sending terminal), launch:
 

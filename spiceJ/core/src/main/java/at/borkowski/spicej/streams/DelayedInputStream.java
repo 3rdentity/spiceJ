@@ -125,7 +125,7 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
       if (delay == 0)
          handleNewData();
 
-      if (eof)
+      if (eof && start == end)
          return -1;
 
       waitForAvailable();
@@ -181,7 +181,7 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
 
    @Override
    public int read(byte[] b, int off, int len) throws IOException {
-      if (eof)
+      if (eof && start == end)
          return -1;
 
       checkNotClosed();
@@ -240,7 +240,7 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
    @Override
    public int available() throws IOException {
       checkNotClosed();
-      if (eof)
+      if (eof && start == end)
          return 0;
 
       if (delay == 0)
@@ -277,8 +277,10 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
             int rd;
             while (toRead > 0) {
                rd = real.read(buffer, end, Math.min(toRead, buffer.length - end));
-               if (rd == -1)
-                  break; // TODO: handle stream closing
+               if (rd == -1) {
+                  eof = true;
+                  break;
+               }
                toRead -= rd;
                end += rd;
                if (end >= buffer.length)

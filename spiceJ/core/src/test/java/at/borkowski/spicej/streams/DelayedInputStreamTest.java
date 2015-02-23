@@ -280,7 +280,6 @@ public class DelayedInputStreamTest {
 
    @Test
    public void testWrapAround() throws IOException {
-      System.out.println("w");
       byte[] blkA = new byte[BUFFER - 5];
       Random random = new Random();
 
@@ -288,36 +287,30 @@ public class DelayedInputStreamTest {
       PipedOutputStream feed = feed1;
 
       for (int i = 0; i < 4; i++) {
-         System.out.println("i " + i);
          random.nextBytes(blkA);
 
          assertEquals(0, sut.available());
          assertEquals(0, sut.bufferedBytes());
          assertEquals(BUFFER, sut.freeBytes());
 
-         System.out.println("w blk " + blkA.length);
          feed.write(blkA);
 
          assertEquals(0, sut.available());
          assertEquals(0, sut.bufferedBytes());
          assertEquals(BUFFER, sut.freeBytes());
 
-         System.out.println("adv1 " + i);
          t.advance();
 
-         System.out.println("av1 " + i + " " + sut.available());
          assertEquals(blkA.length, sut.available());
          assertEquals(blkA.length, sut.bufferedBytes());
          assertEquals(BUFFER - blkA.length, sut.freeBytes());
 
          byte[] rdA = new byte[blkA.length];
-         System.out.println("rd1 " + i);
          rdA[0] = (byte) sut.read();
          assertEquals(blkA.length - 1, sut.available());
          assertEquals(blkA.length - 1, sut.bufferedBytes());
          assertEquals(BUFFER - blkA.length + 1, sut.freeBytes());
 
-         System.out.println("adv2 " + i);
          t.advance();
          assertEquals(blkA.length - 1, sut.available());
          assertEquals(blkA.length - 1, sut.bufferedBytes());
@@ -325,7 +318,6 @@ public class DelayedInputStreamTest {
 
          int done = 1;
 
-         System.out.println("rd2 " + i);
          while (done < rdA.length)
             done += sut.read(rdA, done, rdA.length - done);
 
@@ -392,6 +384,66 @@ public class DelayedInputStreamTest {
       feed.close();
 
       sut.__waitForEofDetector();
+
+      t.advance();
+      assertEquals(-1, sut.read());
+   }
+
+   @Test
+   public void testClosingInDelay() throws IOException {
+      DelayedInputStream sut = sutn;
+      PipedOutputStream feed = feedn;
+      byte[] blk = new byte[12];
+
+      sut.setNonBlocking(true);
+      sut.setEofDetection(true);
+
+      assertEquals(0, sut.available());
+      assertEquals(0, sut.bufferedBytes());
+      assertEquals(BUFFER, sut.freeBytes());
+
+      feed.write(blk);
+
+      assertEquals(0, sut.available());
+      assertEquals(0, sut.bufferedBytes());
+      assertEquals(BUFFER, sut.freeBytes());
+
+      t.advance();
+
+      feed.close();
+
+      sut.__waitForEofDetector();
+
+      assertEquals(0, sut.available());
+      assertEquals(blk.length, sut.bufferedBytes());
+      assertEquals(BUFFER - blk.length, sut.freeBytes());
+
+      for (int i = 0; i < DELAY - 2; i++)
+         t.advance();
+
+      assertEquals(0, sut.available());
+      t.advance();
+      assertEquals(blk.length, sut.available());
+
+      byte[] rdA = new byte[blk.length];
+      rdA[0] = (byte) sut.read();
+      assertEquals(blk.length - 1, sut.available());
+      assertEquals(blk.length - 1, sut.bufferedBytes());
+      assertEquals(BUFFER - blk.length + 1, sut.freeBytes());
+
+      t.advance();
+
+      assertEquals(blk.length - 1, sut.available());
+      assertEquals(blk.length - 1, sut.bufferedBytes());
+      assertEquals(BUFFER - blk.length + 1, sut.freeBytes());
+
+      int done = 1;
+      while (done < rdA.length)
+         done += sut.read(rdA, done, rdA.length - done);
+
+      assertEquals(0, sut.available());
+      assertEquals(0, sut.bufferedBytes());
+      assertEquals(BUFFER, sut.freeBytes());
 
       t.advance();
       assertEquals(-1, sut.read());

@@ -15,7 +15,7 @@ import at.borkowski.spicej.ticks.TickSource;
 class RateHelper {
    private final TickSource tickSource;
    private int thingsPerTick;
-   private final int prescaler;
+   private int prescale;
 
    private final Listener listener;
 
@@ -34,13 +34,13 @@ class RateHelper {
     * @param thingsRate
     *           How many "things" (eg. bytes) per tick (after prescaling) should
     *           be allowed.
-    * @param prescaler
+    * @param prescale
     *           How to prescale ticks
     */
    RateHelper(TickSource tickSource, int thingsRate, int prescaler) {
       this.tickSource = tickSource;
       this.thingsPerTick = thingsRate;
-      this.prescaler = prescaler;
+      this.prescale = prescaler;
 
       timewiseAvailable = thingsRate;
 
@@ -69,7 +69,7 @@ class RateHelper {
     * 
     * @return
     */
-   public int getBytesPerTick() {
+   public int getThingsPerTick() {
       return thingsPerTick;
    }
 
@@ -149,7 +149,7 @@ class RateHelper {
    private class Listener implements TickListener {
       @Override
       public void tick(long tick) {
-         if (prescaler <= 1 || tick % prescaler == 0) {
+         if (prescale <= 1 || tick % prescale == 0) {
             int value;
             while (true) {
                int stored = spent.get();
@@ -192,8 +192,46 @@ class RateHelper {
       boolean idle();
    }
 
+   /**
+    * Sets the {@link RateHelper}'s non-blocking mode, specifying that this
+    * object's {@link #take(int)} and {@link #takeOne()} methods throw
+    * {@link WouldBlockException} whenever the stream would block and wait for a
+    * tick to happen, in order for new data to become available.
+    * 
+    * @param nonBlocking
+    *           <code>true</code> if non-blocking mode should be turned on,
+    *           <code>false</code> otherwise
+    */
    public void setNonBlocking(boolean nonBlocking) {
       this.nonBlockng = nonBlocking;
+   }
+
+   /**
+    * Returns the {@link TickSource} used by this {@link RateHelper} instance.
+    * 
+    * @return the used tick source
+    */
+   public TickSource getTickSource() {
+      return tickSource;
+   }
+
+   /**
+    * Returns the current prescale
+    * 
+    * @return the current prescale
+    */
+   public int getPrescale() {
+      return prescale;
+   }
+
+   /**
+    * Sets a new prescale
+    * 
+    * @param prescale
+    *           the new prescale
+    */
+   public void setPrescale(int prescale) {
+      this.prescale = prescale;
    }
 
 }

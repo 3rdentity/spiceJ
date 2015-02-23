@@ -13,7 +13,6 @@ import at.borkowski.spicej.ticks.TickSource;
  */
 public class RateLimitOutputStream extends OutputStream implements RateShaper {
    private final OutputStream real;
-   private int bytesPerTick;
 
    private final RateHelper rateHelper;
 
@@ -33,14 +32,20 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
     */
    public RateLimitOutputStream(OutputStream real, TickSource tickSource, int byteRate, int prescale) {
       this.real = real;
-      this.bytesPerTick = byteRate;
 
       this.rateHelper = new RateHelper(tickSource, byteRate, prescale);
    }
 
+   // TODO test this
    @Override
    public void setByteRate(int bytesPerTick) {
-      this.bytesPerTick = bytesPerTick;
+      rateHelper.setThingsPerTick(bytesPerTick);
+   }
+
+   // TODO test this
+   @Override
+   public int getByteRate() {
+      return rateHelper.getThingsPerTick();
    }
 
    @Override
@@ -53,7 +58,7 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
    public void write(byte[] b, int off, int len) throws IOException {
       int done = 0;
       while (done < len)
-         done += realWrite(b, off + done, Math.min(len - done, bytesPerTick));
+         done += realWrite(b, off + done, Math.min(len - done, rateHelper.getThingsPerTick()));
    }
 
    // len <= num
@@ -93,6 +98,17 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
     */
    public void setNonBlocking(boolean nonBlocking) {
       rateHelper.setNonBlocking(nonBlocking);
+   }
+   
+   @Override
+   public int getPrescale() {
+      return rateHelper.getPrescale();
+   }
+
+   // TODO: test
+   @Override
+   public void setPrescale(int prescale) {
+      rateHelper.setPrescale(prescale);
    }
 
 }

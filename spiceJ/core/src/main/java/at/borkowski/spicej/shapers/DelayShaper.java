@@ -15,4 +15,11 @@ public interface DelayShaper {
     */
    // TODO test this
    void setByteRate(long delay);
+
+   /**
+    * Returns the current delay in ticks.
+    * 
+    * @return the current delay in ticks
+    */
+   long getByteRate();
 }

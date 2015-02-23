@@ -70,12 +70,14 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
       this.rateHelper = new RateHelper(tickSource, byteRate, prescale);
    }
 
-   /**
-    * Sets a new byte rate.
-    */
    @Override
    public void setByteRate(int bytesPerTick) {
       rateHelper.setThingsPerTick(bytesPerTick);
+   }
+   
+   @Override
+   public int getByteRate() {
+      return rateHelper.getThingsPerTick();
    }
 
    // len <= num
@@ -124,7 +126,7 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
    public int read(byte[] b, int off, int len) throws IOException {
       int done = 0;
       while (done < len && (done == 0 || available() > 0 || (boring && real.available() > 0)))
-         done += realRead(b, off + done, Math.min(len - done, Math.max(1, rateHelper.getBytesPerTick())));
+         done += realRead(b, off + done, Math.min(len - done, Math.max(1, rateHelper.getThingsPerTick())));
       return done;
    }
 
@@ -204,6 +206,35 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
     */
    public void setNonBlocking(boolean nonBlocking) {
       rateHelper.setNonBlocking(nonBlocking);
+   }
+
+   /**
+    * Returns the underlying {@link InputStream}.
+    * 
+    * @return the underlying stream
+    */
+   public InputStream getBaseStream() {
+      return real;
+   }
+
+   /**
+    * Returns the {@link TickSource} this stream uses.
+    * 
+    * @return the used tick source
+    */
+   public TickSource getTickSource() {
+      return rateHelper.getTickSource();
+   }
+
+   @Override
+   public int getPrescale() {
+      return rateHelper.getPrescale();
+   }
+   
+   // TODO: test
+   @Override
+   public void setPrescale(int prescale) {
+      rateHelper.setPrescale(prescale);
    }
 
 }

@@ -209,4 +209,9 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
       this.delay = delay;
    }
 
+   @Override
+   public long getByteRate() {
+      return delay;
+   }
+
 }

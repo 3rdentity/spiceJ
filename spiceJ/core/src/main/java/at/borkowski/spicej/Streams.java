@@ -77,7 +77,6 @@ public class Streams {
     *           )
     * @return the resulting input stream
     */
-   // TODO test this
    public static DelayedInputStream addDelay(InputStream base, TickSource tickSource, long delay, int bufferSize) {
       return new DelayedInputStream(tickSource, base, delay, bufferSize);
    }

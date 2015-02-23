@@ -2,6 +2,7 @@ package at.borkowski.spicej.streams;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -14,16 +15,16 @@ import at.borkowski.spicej.ticks.TickListener;
 import at.borkowski.spicej.ticks.TickSource;
 
 /**
- * Provides an {@link InputStream} instance with a delay real the transferred
+ * Provides an {@link OutputStream} instance with a delay real the transferred
  * bytes.
  * 
  * The stream uses a {@link TickSource} as a source of timing information and
- * delays the reception of data by a certain number of ticks.
+ * delays the sending of data by a certain number of ticks.
  *
  */
-public class DelayedInputStream extends InputStream implements TickListener, DelayShaper {
+public class DelayedOutputStream extends OutputStream implements TickListener, DelayShaper {
 
-   private final InputStream real;
+   private final OutputStream real;
    private final TickSource t;
    private long delay;
    private final byte[] buffer;
@@ -41,7 +42,7 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
    private SleepWakeup sleep = new SleepWakeup();
 
    /**
-    * Constructs a new {@link DelayedInputStream} with the given parameters.
+    * Constructs a new {@link DelayedOutputStream} with the given parameters.
     * 
     * @param t
     *           The tick source to use
@@ -58,7 +59,7 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
     *           than the expected data arrivel rate (times the expected interval
     *           of reading from this stream).
     */
-   public DelayedInputStream(TickSource t, InputStream real, long delay, int bufferSize) {
+   public DelayedOutputStream(TickSource t, OutputStream real, long delay, int bufferSize) {
       this.real = real;
       this.t = t;
       this.delay = delay;
@@ -73,62 +74,86 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
    }
 
    @Override
-   public int read() throws IOException {
-      if (delay == 0)
-         handleNewData();
-
-      waitForAvailable();
-
-      byte b = buffer[start++];
-      if (start >= buffer.length)
-         start -= buffer.length;
-      return b & 0xFF;
-
+   public void write(int b) throws IOException {
+      write(new byte[] { (byte) b }, 0, 1);
    }
 
-   private void waitForAvailable() {
-      while (bufferedBytes(currentAvailableEnd) == 0) {
+   @Override
+   public void write(byte[] b, int off, int len) throws IOException {
+      while (freeBytes() < len)
          if (!blocking)
             throw new WouldBlockException();
          else
             sleep.sleep();
+
+      if(end + len >= buffer.length) {
+         int chunk1 = buffer.length - end;
+         System.arraycopy(b, off, buffer, end, chunk1);
+         end = 0;
+         off += chunk1;
+         len -= chunk1;
       }
+      System.arraycopy(b, off, buffer, end, len);
+      int previousEnd = end;
+
+      end += len;
+      if (end >= buffer.length)
+         end -= buffer.length;
+      if (end != previousEnd && delay > 0) {
+         tick_virtualEnd.put(currentTick + delay, end);
+         tickMarks.add(currentTick + delay);
+      }
+
+      if (delay == 0)
+         handleWritableData();
+   }
+
+   @Override
+   public void tick(long tick) {
+      currentTick = tick;
+      handleWritableData();
+   }
+
+   private void handleWritableData() {
+      while (!tickMarks.isEmpty() && tickMarks.first() <= currentTick) {
+         Long tick = tickMarks.first();
+         tickMarks.remove(tick);
+         currentAvailableEnd = tick_virtualEnd.remove(tick);
+      }
+
+      if (tickMarks.isEmpty())
+         currentAvailableEnd = end;
+      
+      int writable = bufferedBytes(currentAvailableEnd);
+
+      if (writable == 0)
+         return;
+
+      try {
+         int todo = writable;
+         if (start + todo > buffer.length) {
+            int chunk1 = buffer.length - start;
+            real.write(buffer, start, chunk1);
+            todo -= chunk1;
+            start = 0;
+         }
+         real.write(buffer, start, todo);
+         start += todo;
+         if (start >= buffer.length)
+            start -= buffer.length;
+      } catch (IOException ioEx) {
+         throw new RuntimeException("delayed data transmission error", ioEx);
+      }
+   }
+
+   public void write(byte[] b) throws IOException {
+      write(b, 0, b.length);
    }
 
    @Override
    public void close() throws IOException {
       real.close();
       // TODO better handling of closed streams
-   }
-
-   @Override
-   public int read(byte[] b, int off, int len) throws IOException {
-      if (delay == 0)
-         handleNewData();
-
-      waitForAvailable();
-      int readable = bufferedBytes(currentAvailableEnd);
-
-      int ret;
-      int toRead = ret = Math.min(len, readable);
-      if (start + toRead > buffer.length) {
-         int chunk1 = buffer.length - start;
-         System.arraycopy(buffer, start, b, off, chunk1);
-         toRead -= chunk1;
-         off += chunk1;
-         start = 0;
-      }
-      System.arraycopy(buffer, start, b, off, toRead);
-      start += toRead;
-      if (start >= buffer.length)
-         start -= buffer.length;
-
-      return ret;
-   }
-
-   @Override
-   public int read(byte[] b) throws IOException {
-      return read(b, 0, b.length);
    }
 
    int bufferedBytes() {
@@ -146,59 +171,6 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
 
    int freeBytes() {
       return buffer.length - bufferedBytes() - 1;
-   }
-
-   @Override
-   public void tick(long tick) {
-      currentTick = tick;
-      handleNewData();
-   }
-
-   @Override
-   public int available() throws IOException {
-      if (delay == 0)
-         handleNewData();
-      return bufferedBytes(currentAvailableEnd);
-   }
-
-   private void handleNewData() {
-      try {
-         int previousEnd = end;
-
-         if (real.available() > 0 && freeBytes() > 0) {
-            int toRead = Math.min(freeBytes(), real.available());
-            int rd;
-            while (toRead > 0) {
-               rd = real.read(buffer, end, Math.min(toRead, buffer.length - end));
-               if (rd == -1)
-                  break; // TODO: handle stream closing
-               toRead -= rd;
-               end += rd;
-               if (end >= buffer.length)
-                  end -= buffer.length;
-               if (end != previousEnd && delay > 0) {
-                  // -1 is necessary because we read data one tick later than it actually arrived
-                  // (we assume to receive the tick after the phase generating the data)
-                  tick_virtualEnd.put(currentTick + delay - 1, end);
-                  tickMarks.add(currentTick + delay - 1);
-               }
-            }
-         }
-
-         sleep.wakeup();
-      } catch (IOException e) {
-         // TODO handle exceptions
-         throw new RuntimeException(e);
-      }
-
-      while (!tickMarks.isEmpty() && tickMarks.first() <= currentTick) {
-         Long tick = tickMarks.first();
-         tickMarks.remove(tick);
-         currentAvailableEnd = tick_virtualEnd.remove(tick);
-      }
-
-      if (tickMarks.isEmpty())
-         currentAvailableEnd = end;
    }
 
    @Override
@@ -225,7 +197,7 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
     * 
     * @return the underlying stream
     */
-   public InputStream getBaseStream() {
+   public OutputStream getBaseStream() {
       return real;
    }
 

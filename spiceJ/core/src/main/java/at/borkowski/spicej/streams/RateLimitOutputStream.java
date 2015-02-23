@@ -111,4 +111,22 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
       rateHelper.setPrescale(prescale);
    }
 
+   /**
+    * Returns the underlying {@link OutputStream}.
+    * 
+    * @return the underlying stream
+    */
+   public OutputStream getBaseStream() {
+      return real;
+   }
+
+   /**
+    * Returns the {@link TickSource} this stream uses.
+    * 
+    * @return the used tick source
+    */
+   public TickSource getTickSource() {
+      return rateHelper.getTickSource();
+   }
+
 }

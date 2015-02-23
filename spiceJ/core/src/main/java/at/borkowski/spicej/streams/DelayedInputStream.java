@@ -28,7 +28,7 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
    private long delay;
    private final byte[] buffer;
 
-   private boolean blocking = true;
+   private boolean blocking = true, eof = false, closed = false;
    private long currentTick;
 
    private volatile int currentAvailableEnd = 0;
@@ -74,6 +74,11 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
 
    @Override
    public int read() throws IOException {
+      if (eof)
+         return -1;
+
+      checkNotClosed();
+
       if (delay == 0)
          handleNewData();
 
@@ -84,6 +89,11 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
          start -= buffer.length;
       return b & 0xFF;
 
+   }
+
+   private void checkNotClosed() throws IOException {
+      if (closed)
+         throw new IOException("stream closed by reader");
    }
 
    private void waitForAvailable() {
@@ -98,11 +108,18 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
    @Override
    public void close() throws IOException {
       real.close();
-      // TODO better handling of closed streams
+      closed = true;
+      eof = true;
+      t.removeListener(this);
    }
 
    @Override
    public int read(byte[] b, int off, int len) throws IOException {
+      if (eof)
+         return -1;
+
+      checkNotClosed();
+
       if (delay == 0)
          handleNewData();
 
@@ -156,8 +173,13 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
 
    @Override
    public int available() throws IOException {
+      checkNotClosed();
+      if (eof)
+         return 0;
+      
       if (delay == 0)
          handleNewData();
+      
       return bufferedBytes(currentAvailableEnd);
    }
 
@@ -236,6 +258,17 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
     */
    public TickSource getTickSource() {
       return t;
+   }
+
+   /**
+    * Sets the non-blocking flag.
+    * 
+    * @param nonBlocking
+    *           whether the stream should be in non-blocking mode (see
+    *           {@link RateLimitInputStream}).
+    */
+   public void setNonBlocking(boolean nonBlocking) {
+      blocking = !nonBlocking;
    }
 
 }

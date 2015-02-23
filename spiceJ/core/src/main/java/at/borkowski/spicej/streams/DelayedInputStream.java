@@ -34,12 +34,11 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
    private volatile int currentAvailableEnd = 0;
    private volatile int start = 0;
    private volatile int end = 0;
-   
+
    private SortedSet<Long> tickMarks = new TreeSet<Long>();
    private Map<Long, Integer> tick_virtualEnd = new HashMap<>();
 
    private SleepWakeup sleep = new SleepWakeup();
-   private Object lock = new Object();
 
    /**
     * Constructs a new {@link DelayedInputStream} with the given parameters.
@@ -52,12 +51,12 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
     *           The delay (real ticks) to introduce to data
     * @param bufferSize
     *           The buffer size to use. The implementation has to store read
-    *           bytes real an intermediate buffer. The buffer must be large enough
-    *           to store the data. Note that data which cannot be stored into
-    *           the buffer because of its overflow will have a higher delay,
-    *           which is why the buffer should be significantly higher than the
-    *           expected data arrivel rate (times the expected interval of
-    *           reading from this stream).
+    *           bytes real an intermediate buffer. The buffer must be large
+    *           enough to store the data. Note that data which cannot be stored
+    *           into the buffer because of its overflow will have a higher
+    *           delay, which is why the buffer should be significantly higher
+    *           than the expected data arrivel rate (times the expected interval
+    *           of reading from this stream).
     */
    public DelayedInputStream(TickSource t, InputStream real, long delay, int bufferSize) {
       this.real = real;
@@ -80,12 +79,10 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
 
       waitForAvailable();
 
-      synchronized (lock) {
-         byte b = buffer[start++];
-         if (start >= buffer.length)
-            start -= buffer.length;
-         return b & 0xFF;
-      }
+      byte b = buffer[start++];
+      if (start >= buffer.length)
+         start -= buffer.length;
+      return b & 0xFF;
 
    }
 
@@ -122,11 +119,9 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
          start = 0;
       }
       System.arraycopy(buffer, start, b, off, toRead);
-      synchronized (lock) {
-         start += toRead;
-         if (start >= buffer.length)
-            start -= buffer.length;
-      }
+      start += toRead;
+      if (start >= buffer.length)
+         start -= buffer.length;
 
       return ret;
    }
@@ -178,14 +173,12 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
                if (rd == -1)
                   break; // TODO: handle stream closing
                toRead -= rd;
-               synchronized (lock) {
-                  end += rd;
-                  if (end >= buffer.length)
-                     end -= buffer.length;
-                  if (end != previousEnd && delay > 0) {
-                     tick_virtualEnd.put(currentTick + delay - 1, end);
-                     tickMarks.add(currentTick + delay - 1);
-                  }
+               end += rd;
+               if (end >= buffer.length)
+                  end -= buffer.length;
+               if (end != previousEnd && delay > 0) {
+                  tick_virtualEnd.put(currentTick + delay - 1, end);
+                  tickMarks.add(currentTick + delay - 1);
                }
             }
          }

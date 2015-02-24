@@ -71,7 +71,7 @@ Finally, in terminal 3 (sending terminal), launch:
 
 In terminal 1, `pv` should now show roughly the described byte rate. Note that `pv` uses binary prefixes (kiB, MiB, etc.), which denote multiples of 1024, and we specified powers of 10 in bytes per second, so the result deviates from the intuitively expected value.
 
-There is almost no lower bound; spiceJ is designed to work with byte rates well below 1 B/s. The actual lower bound is caused by the way spiceJ internally generates low-rate traffic, but this bound is below 0.000000001 B/s  or 1/1000000000 B/s (this is 1 byte in 31.7 years). Also note that `pv` (in its current implementation) has a resolution of 1 s, which means that byte rates lower than 1 B/s are harder to measure. A natural upper bound of the byte rate is your system throughput, to which spiceJ naturally adds some overhead. The highest theoretically representable byterate is a bit lower than `Float.MAX_VALUE`, and its value is around 340090000000000000000000000 TB/s
+There is almost no lower bound; spiceJ is designed to work with byte rates well below 1 B/s. The actual lower bound is caused by the way spiceJ internally generates low-rate traffic, but this bound is below 7.5E-10 or 0.00000000075 B/s (this is 1 byte in 2378.2 years). Also note that `pv` (in its current implementation) has a resolution of 1 s, which means that byte rates lower than 1 B/s are harder to measure. A natural upper bound of the byte rate is your system throughput, to which spiceJ naturally adds some overhead. The highest theoretically representable byterate is bounded by the minimum interval of 1 ns and results in a byte rate boundary just above 1.81E16 or 18100000000000000 B/s, which is 181000 TB/s (181 PB/s).
 
 ### Unit Tests
 

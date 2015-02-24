@@ -70,14 +70,14 @@ public class RateCalculator {
     * The lower bound for the interval. Intervals lower than this might not be
     * reliably possible on some hardware.
     */
-   public static final int MIN_INTERVAL_NS = 50 * NS_PER_MS;
+   public static final int MIN_INTERVAL_NS = 100;
 
    /**
     * The upper bound for the interval.
     */
    public static final int MAX_INTERVAL_NS = NS_PER_S; // 1 second = maximal interval
 
-   public static final int MAX_BYTES_PER_TICK = Integer.MAX_VALUE;
+   public static final int MAX_BYTES_PER_TICK = 10 * 1024 * 1024; //Integer.MAX_VALUE;
 
    /**
     * The threshold value for byterates above which MIN_INTERVAL is reached.
@@ -90,6 +90,8 @@ public class RateCalculator {
    public static final int SCALE = 70;
 
    public static final RoundingMode ROUND = RoundingMode.HALF_UP;
+
+   public static final double MAX_ERROR = 0.005;
 
    /**
     * Performs a calculation with the default minimal interval (see
@@ -116,6 +118,7 @@ public class RateCalculator {
    public static Result calculate(float rateBytesPerSecond, int minInterval) {
       BigDecimal B_MIN = BigDecimal.ONE;
       BigDecimal B_MAX = BigDecimal.valueOf(MAX_BYTES_PER_TICK);
+      BigDecimal I_MIN = BigDecimal.valueOf(minInterval);
       BigDecimal I_MAX = BigDecimal.valueOf(MAX_INTERVAL_NS);
       BigDecimal Id_MAX = BigDecimal.valueOf(Integer.MAX_VALUE);
 
@@ -128,44 +131,26 @@ public class RateCalculator {
 
       BigDecimal B = R.multiply(I);
 
+      BigDecimal ERROR;
+      BigDecimal ERROR_MAX = BigDecimal.valueOf(MAX_ERROR);
+
+      BigDecimal R_set = BigDecimal.valueOf(rateBytesPerSecond).divide(ONEG, SCALE, ROUND);
+      BigDecimal R_eff;
+
       // bytes per I_MAX <= 1
       if (B.compareTo(B_MIN) <= 0) {
          B = BigDecimal.ONE;
          I = B.divide(R, SCALE, ROUND);
 
          BigDecimal Id = BigDecimal.ONE;
-         while (I.compareTo(I_MAX) > 0) {
-            I = I.divide(TWO, SCALE, ROUND);
-            Id = Id.multiply(TWO);
-         }
-
-         if (Id.compareTo(Id_MAX) > 0)
-            throw new ArithmeticException("rate too low: prescaler too high");
-
-         return new Result(1, Id.intValue(), I.intValue());
-      } else {
-         BigDecimal Id = BigDecimal.ONE;
-
-         BigDecimal R_set = BigDecimal.valueOf(rateBytesPerSecond).divide(ONEG, SCALE, ROUND);
-         BigDecimal R_eff = B.divide(I, SCALE, ROUND);
-
-         BigDecimal ERROR;
-
-         BigDecimal ERROR_MAX = BigDecimal.valueOf(0.01);
-
          while (true) {
             while (I.compareTo(I_MAX) > 0) {
                I = I.divide(E, SCALE, ROUND);
                Id = Id.multiply(E);
             }
 
-            while (B.compareTo(B_MAX) > 0) {
-               B = B.divide(E, SCALE, ROUND);
-               I = I.divide(E, SCALE, ROUND);
-            }
-
-            //if(I.compareTo(I_MIN) < 0)
-            //   throw new IllegalArgumentException("rate too high: I < I_MIN (" + I + " < " + I_MIN + "); R: " + rateBytesPerSecond);
+            if (Id.compareTo(Id_MAX) > 0)
+               throw new IllegalArgumentException("rate too low (" + rateBytesPerSecond + "): prescaler too high");
 
             BigDecimal B_int = BigDecimal.valueOf(B.setScale(0, ROUND).intValueExact());
             BigDecimal I_int = BigDecimal.valueOf(I.setScale(0, ROUND).intValueExact());
@@ -179,6 +164,40 @@ public class RateCalculator {
             I = I.multiply(E);
             B = B.multiply(E);
          }
+
+         return new Result(B.setScale(0, ROUND).intValueExact(), Id.setScale(0, ROUND).intValueExact(), I.setScale(0, ROUND).intValueExact());
+      } else {
+         BigDecimal Id = BigDecimal.ONE;
+
+         while (true) {
+            while (I.compareTo(I_MAX) > 0) {
+               I = I.divide(E, SCALE, ROUND);
+               Id = Id.multiply(E);
+            }
+
+            while (B.compareTo(B_MAX) > 0) {
+               B = B.divide(TWO, SCALE, ROUND);
+               I = I.divide(TWO, SCALE, ROUND);
+            }
+
+            if (I.compareTo(BigDecimal.ONE) < 0)
+               throw new IllegalArgumentException("rate too high (" + rateBytesPerSecond + "): interval too low");
+
+            BigDecimal B_int = BigDecimal.valueOf(B.setScale(0, ROUND).intValueExact());
+            BigDecimal I_int = BigDecimal.valueOf(I.setScale(0, ROUND).intValueExact());
+            BigDecimal Id_int = BigDecimal.valueOf(Id.setScale(0, ROUND).intValueExact());
+
+            R_eff = B_int.divide(I_int, SCALE, ROUND).divide(Id_int, SCALE, ROUND);
+            ERROR = R_eff.divide(R_set, SCALE, ROUND).subtract(BigDecimal.ONE).abs();
+            if (ERROR.compareTo(ERROR_MAX) < 0)
+               break;
+
+            I = I.multiply(E);
+            B = B.multiply(E);
+         }
+
+         if (I.compareTo(I_MIN) < 0)
+            throw new IllegalArgumentException("rate too high (" + rateBytesPerSecond + "): interval too low");
 
          return new Result(B.setScale(0, ROUND).intValueExact(), Id.setScale(0, ROUND).intValueExact(), I.setScale(0, ROUND).intValueExact());
       }

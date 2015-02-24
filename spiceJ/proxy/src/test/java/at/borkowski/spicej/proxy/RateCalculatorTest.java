@@ -28,6 +28,16 @@ public class RateCalculatorTest {
       }
    }
 
+   @Test(expected = IllegalArgumentException.class)
+   public void testTooLowByterate() {
+      test(7.5E-10F);
+   }
+
+   @Test(expected = IllegalArgumentException.class)
+   public void testTooHighByterate() {
+      test(1.81E+16F);
+   }
+
    @Test
    public void testExtremelyLowByterates() {
       double[] rates = { 0.0001, 0.0005, 0.001, 0.002, 0.003, 0.004, 0.005, 0.007, 0.009, 0.01 };
@@ -79,19 +89,16 @@ public class RateCalculatorTest {
 
    @Test
    public void testExtremelyHighByterates() {
-      double[] ratesG = { 1, 1.2, 1.4, 1.6, 1.8, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 400, 500, 1000 };
+      double[] ratesG = { 1, 1.2, 1.4, 1.6, 1.8, 2, 2.5, 3, 3.4 };
       for (double r : ratesG)
          test((float) r * 1000000000);
    }
 
    private void test(float rate) {
-      evaluate(rate, RateCalculator.calculate(rate), RateCalculator.MIN_INTERVAL_NS);
-      evaluate(rate, RateCalculator.calculate(rate, 50 * 1000000), 50 * 1000000);
-      evaluate(rate, RateCalculator.calculate(rate, 10 * 1000000), 10 * 1000000);
-      evaluate(rate, RateCalculator.calculate(rate, 1 * 1000000), 10 * 1000000);
+      evaluate(rate, RateCalculator.calculate(rate));
    }
 
-   private void evaluate(float rate, Result r, long minInterval) {
+   private void evaluate(float rate, Result r) {
       BigDecimal actualRate_ = new BigDecimal(RateCalculator.NS_PER_S);
       actualRate_ = actualRate_.multiply(new BigDecimal(r.getBytesPerTick()));
       actualRate_ = actualRate_.divide(new BigDecimal(r.getPrescale()), SCALE, RoundingMode.HALF_UP);
@@ -116,9 +123,9 @@ public class RateCalculatorTest {
       if (r.getPrescale() < 1)
          fail("prescale < 1 (" + r.getPrescale() + ") for rate " + rate);
 
-      if (r.getTickNanosecondsInterval() < minInterval)
-         fail("interval < min (" + r.getTickNanosecondsInterval() + " < " + minInterval + ") for rate " + rate);
-      if (r.getBytesPerTick() > RateCalculator.MAX_INTERVAL_NS)
+      if (r.getTickNanosecondsInterval() < RateCalculator.MIN_INTERVAL_NS)
+         fail("interval < min (" + r.getTickNanosecondsInterval() + " < " + RateCalculator.MIN_INTERVAL_NS + ") for rate " + rate);
+      if (r.getTickNanosecondsInterval() > RateCalculator.MAX_INTERVAL_NS)
          fail("interval > max (" + r.getTickNanosecondsInterval() + " > " + RateCalculator.MAX_INTERVAL_NS + ") for rate " + rate);
    }
 }

@@ -35,7 +35,14 @@ public class RateCalculatorTest {
 
    @Test(expected = IllegalArgumentException.class)
    public void testTooHighByterate() {
+      test(8.7E+13F);
       test(1.81E+16F);
+   }
+
+   @Test
+   public void testBoundaries() {
+      test(RateCalculator.MIN_RATE);
+      test(RateCalculator.MAX_RATE);
    }
 
    @Test

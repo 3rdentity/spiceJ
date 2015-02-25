@@ -47,14 +47,14 @@ public class RateCalculator {
     * necessarily the exact minimum value, but a value close enough to the
     * minimum lower bound.
     */
-   public static final float MIN_RATE = 0.00000000094F;
+   public static final float MIN_RATE = 7.6E-10F;
 
    /**
     * The highest byte rate representable with our data model (this is not
     * necessarily the exact maximum value, but a value close enough to the
     * maximum upper bound.
     */
-   public static final float MAX_RATE = 340092346638528859811704183484516925440F;
+   public static final float MAX_RATE = 8.7E+13F;
 
    /**
     * Nanoseconds per second.
@@ -62,35 +62,36 @@ public class RateCalculator {
    public static final int NS_PER_S = 1000000000;
 
    /**
-    * Nanoseconds per millisecond.
-    */
-   public static final int NS_PER_MS = 1000000;
-
-   /**
-    * The lower bound for the interval. Intervals lower than this might not be
-    * reliably possible on some hardware.
+    * The default enforced lower bound for the interval. Intervals lower than
+    * this might not be reliably possible on some hardware.
     */
    public static final int MIN_INTERVAL_NS = 100;
 
    /**
-    * The upper bound for the interval.
+    * The enforced upper bound for the interval. Rates requiring a higher
+    * interval will be forced to be realized use prescaling.
     */
-   public static final int MAX_INTERVAL_NS = NS_PER_S; // 1 second = maximal interval
-
-   public static final int MAX_BYTES_PER_TICK = 10 * 1024 * 1024; //Integer.MAX_VALUE;
+   public static final int MAX_INTERVAL_NS = NS_PER_S;
 
    /**
-    * The threshold value for byterates above which MIN_INTERVAL is reached.
+    * The enforced upper bound for bytes per tick. Higher values result in a
+    * bigger buffer and higher memory usage.
     */
-   public static final long THRESHOLD = (long) Math.ceil((double) NS_PER_S / MIN_INTERVAL_NS);
+   public static final int MAX_BYTES_PER_TICK = 10 * 1024 * 1024;
 
    /**
     * The scale (see {@link BigDecimal}) used for internal calculations.
     */
    public static final int SCALE = 70;
 
+   /**
+    * The rounding mode (see {@link BigDecimal}) used for internal calculation.
+    */
    public static final RoundingMode ROUND = RoundingMode.HALF_UP;
 
+   /**
+    * The error margin permitted for calculations.
+    */
    public static final double MAX_ERROR = 0.005;
 
    /**

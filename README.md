@@ -9,17 +9,17 @@ Its goal is the simulation of a few network properties:
 1. Limited Bandwidth
 1. Additional Latency
 
-All properties allow for jitter (**not yet implemented**), and are dynamic (ie. can change during simulation time).
+When being used as a library, both bandwidth and latency allow for jitter, and are dynamic (ie. can change during simulation time).
 
-spiceJ aims to support reproducible outcomes by being independent of its clock source. In other words, using a controllable clock source (see `SimulationTickSource`) a deterministic outcome can be achieved. On the other hand, if the goal is to shape network in real time, `RealTimeTickSource` can be used to clock the shaping components, resulting in a live traffic shaping.
+spiceJ aims to support reproducible outcome by being independent of its clock source. In other words, using a controllable clock source (see `SimulationTickSource`) a deterministic outcome can be achieved. On the other hand, if the goal is to shape network in real time, `RealTimeTickSource` can be used to clock the shaping components, resulting in a live traffic shaping.
 
-spiceJ consists of Java Proxy Objects of InputStream and OutputStream, hiding the original stream and adding the desired properties. Furthermore, spiceJ offers wrappers for creating a transparent (stand-alone) TCP proxy, allowing users to simulate network shaping using any client application.
+spiceJ consists of Java Proxy Objects of InputStream and OutputStream, hiding the original stream and adding the desired properties. Furthermore, spiceJ offers wrappers for creating a transparent (stand-alone) TCP proxy, allowing users to simulate network shaping using any client application. This proxy can be launched stand-alone from command line.
 
 ## Build
 
 The project is using maven as a built tool, so simply running
 
-    mvn package
+    $ mvn package
 
 is enough to compile, test and package all source code. The stand-alone proxy is packaged as a runnable JAR `proxy/target/proxy-X.Y.Z-jar-with-dependencies.jar`, where `X.Y.Z` is the current version.
 
@@ -75,7 +75,7 @@ There is almost no lower bound; spiceJ is designed to work with byte rates well 
 
 ### Unit Tests
 
-Unit tests are present for most classes. In detail, the classes providing the external outcome (`RateLimitInputStream` and `RateLimitOutputStream`) are tested. Untested classes are simple utility methods, getters/setters and user interface (command line parsing) classes.
+Unit tests are present for most classes. Specifially, all external API classes (eg. `RateLimitInputStream`, `RateLimitOutputStream`, `DelayedInputStream`, `DelayedOutputStream` etc.) are tested. Untested classes are simple utility methods, getters/setters and user interface (command line parsing) classes.
 
 ### Real-Time Tests
 

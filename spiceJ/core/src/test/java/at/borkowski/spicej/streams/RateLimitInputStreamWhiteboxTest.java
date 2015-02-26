@@ -13,7 +13,7 @@ import at.borkowski.spicej.streams.RateHelper.IdleNotify;
 import at.borkowski.spicej.streams.util.PipedInputStream;
 import at.borkowski.spicej.streams.util.PipedOutputStream;
 
-public class RateLimitInputStreamTest {
+public class RateLimitInputStreamWhiteboxTest {
 
    private PipedOutputStream pos;
    private RateLimitInputStream sut;

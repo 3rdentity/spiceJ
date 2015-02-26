@@ -30,6 +30,11 @@ import at.borkowski.spicej.ticks.TickSource;
  * read immediately (except for the first byte which, according to the
  * definition of {@link InputStream}, causes blocking for all read methods).
  * 
+ * Note that blocking and boring are two different concept even though they seem
+ * similar. Non-blocking will cause methods to throw exceptions, where
+ * non-boring only means that read methods exit sooner in certain situations
+ * than in boring mode.
+ * 
  * Streams are non-boring by default.
  * 
  */
@@ -74,7 +79,7 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
    public void setByteRate(int bytesPerTick) {
       rateHelper.setThingsPerTick(bytesPerTick);
    }
-   
+
    @Override
    public int getByteRate() {
       return rateHelper.getThingsPerTick();
@@ -230,7 +235,7 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
    public int getPrescale() {
       return rateHelper.getPrescale();
    }
-   
+
    // TODO: test
    @Override
    public void setPrescale(int prescale) {

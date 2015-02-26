@@ -173,6 +173,7 @@ public class DelayedOutputStream extends OutputStream implements TickListener, D
       return buffer.length - bufferedBytes() - 1;
    }
 
+   // TODO test this
    @Override
    public void setDelay(long delay) {
       this.delay = delay;

@@ -312,6 +312,7 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
          currentAvailableEnd = end;
    }
 
+   // TODO test this
    @Override
    public void setDelay(long delay) {
       this.delay = delay;

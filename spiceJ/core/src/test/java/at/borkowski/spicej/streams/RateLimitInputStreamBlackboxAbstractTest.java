@@ -49,174 +49,174 @@ public abstract class RateLimitInputStreamBlackboxAbstractTest {
 
    protected abstract int getPrescaler();
 
-   private void test(int number, int blockSize, long[] expected, boolean boring) throws IOException {
+   private void test(int blockSize, long[] expected, boolean boring) throws IOException {
       for (int i = 0; i < expected.length; i++)
          expected[i] *= getPrescaler();
 
       sut.setBoring(boring);
-      recorder.startRecording(sut, number, blockSize);
-      pos.write(new byte[number]);
+      recorder.startRecording(sut, expected.length, blockSize);
+      pos.write(new byte[expected.length]);
       pos.flush();
       recorder.assertTimestamps(expected);
    }
 
    @Test
    public void testOneTickBytewise() throws IOException {
-      test(6, 0, new long[] { 0, 0, 0, 0, 0, 0 }, false);
+      test(0, new long[] { 0, 0, 0, 0, 0, 0 }, false);
    }
 
    @Test
    public void testOneTickBytewise_boring() throws IOException {
-      test(6, 0, new long[] { 0, 0, 0, 0, 0, 0 }, true);
+      test(0, new long[] { 0, 0, 0, 0, 0, 0 }, true);
    }
 
    @Test
    public void testOneTickSmallBuffer() throws IOException {
-      test(6, 4, new long[] { 0, 0, 0, 0, 0, 0 }, false);
+      test(4, new long[] { 0, 0, 0, 0, 0, 0 }, false);
    }
 
    @Test
    public void testOneTickSmallBuffer_boring() throws IOException {
-      test(6, 4, new long[] { 0, 0, 0, 0, 0, 0 }, true);
+      test(4, new long[] { 0, 0, 0, 0, 0, 0 }, true);
    }
 
    @Test
    public void testOneTickExactBuffer() throws IOException {
-      test(6, 6, new long[] { 0, 0, 0, 0, 0, 0 }, false);
+      test(6, new long[] { 0, 0, 0, 0, 0, 0 }, false);
    }
 
    @Test
    public void testOneTickExactBuffer_boring() throws IOException {
-      test(6, 6, new long[] { 0, 0, 0, 0, 0, 0 }, true);
+      test(6, new long[] { 0, 0, 0, 0, 0, 0 }, true);
    }
 
    @Test
    public void testOneTickExcessBuffer() throws IOException {
-      test(6, 8, new long[] { 0, 0, 0, 0, 0, 0 }, false);
+      test(8, new long[] { 0, 0, 0, 0, 0, 0 }, false);
    }
 
    @Test
    public void testOneTickExcessBuffer_boring() throws IOException {
-      test(6, 8, new long[] { 0, 0, 0, 0, 0, 0 }, true);
+      test(8, new long[] { 0, 0, 0, 0, 0, 0 }, true);
    }
 
    @Test
    public void testTwoTicksBytewise() throws IOException {
-      test(13, 0, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
+      test(0, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
    }
 
    @Test
    public void testTwoTicksBytewise_boring() throws IOException {
-      test(13, 0, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, true);
+      test(0, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, true);
    }
 
    @Test
    public void testTwoTicksSmallBuffer() throws IOException {
-      test(13, 4, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
+      test(4, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
    }
 
    @Test
    public void testTwoTicksSmallBuffer_boring() throws IOException {
-      test(13, 4, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1 }, true);
+      test(4, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1 }, true);
    }
 
    @Test
    public void testTwoTicksBlockBuffer() throws IOException {
-      test(13, 10, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
+      test(10, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
    }
 
    @Test
    public void testTwoTicksBlockBuffer_boring() throws IOException {
-      test(13, 10, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, true);
+      test(10, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, true);
    }
 
    @Test
    public void testTwoTicksOverBlockBuffer() throws IOException {
-      test(13, 11, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
+      test(11, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
    }
 
    @Test
    public void testTwoTicksOverBlockBuffer_boring() throws IOException {
-      test(13, 11, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, true);
+      test(11, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, true);
    }
 
    @Test
    public void testTwoTicksExactBuffer() throws IOException {
-      test(13, 13, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
+      test(13, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
    }
 
    @Test
    public void testTwoTicksExactBuffer_boring() throws IOException {
-      test(13, 13, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, true);
+      test(13, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, true);
    }
 
    @Test
    public void testTwoTicksExcessBuffer() throws IOException {
-      test(13, 15, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
+      test(15, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1 }, false);
    }
 
    @Test
    public void testTwoTicksExcessBuffer_boring() throws IOException {
-      test(13, 15, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, true);
+      test(15, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, true);
    }
 
    @Test
    public void testThreeTicksBytewise() throws IOException {
-      test(23, 0, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
+      test(0, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
    }
 
    @Test
    public void testThreeTicksBytewise_boring() throws IOException {
-      test(23, 0, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, true);
+      test(0, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, true);
    }
 
    @Test
    public void testThreeTicksSmallBuffer() throws IOException {
-      test(23, 4, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
+      test(4, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
    }
 
    @Test
    public void testThreeTicksSmallBuffer_boring() throws IOException {
-      test(23, 4, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, true);
+      test(4, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, true);
    }
 
    @Test
    public void testThreeTicksBlockBuffer() throws IOException {
-      test(23, 10, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
+      test(10, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
    }
 
    @Test
    public void testThreeTicksBlockBuffer_boring() throws IOException {
-      test(23, 10, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, true);
+      test(10, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, true);
    }
 
    @Test
    public void testThreeTicksOverBlockBuffer() throws IOException {
-      test(23, 11, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
+      test(11, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
    }
 
    @Test
    public void testThreeTicksOverBlockBuffer_boring() throws IOException {
-      test(23, 11, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, true);
+      test(11, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, true);
    }
 
    @Test
    public void testThreeTicksExactBuffer() throws IOException {
-      test(23, 13, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
+      test(13, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
    }
 
    @Test
    public void testThreeTicksExactBuffer_boring() throws IOException {
-      test(23, 13, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, true);
+      test(13, new long[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, true);
    }
 
    @Test
    public void testThreeTicksExcessBuffer() throws IOException {
-      test(23, 25, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
+      test(25, new long[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2 }, false);
    }
 
    @Test
    public void testThreeTicksExcessBuffer_boring() throws IOException {
-      test(23, 25, new long[] { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, true);
+      test(25, new long[] { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 }, true);
    }
 }

@@ -13,7 +13,6 @@ public interface DelayShaper {
     * @param delay
     *           the new delay in ticks
     */
-   // TODO test this
    void setDelay(long delay);
 
    /**

@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
-// TODO test this
 public class ProxyMain {
    private static boolean printUsage = true;
    private static boolean printCommandLineErrors = true;

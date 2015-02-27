@@ -3,6 +3,8 @@ package at.borkowski.spicej.streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -302,6 +304,10 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
          throw new RuntimeException(e);
       }
 
+      handleNewTickMarks();
+   }
+
+   private void handleNewTickMarks() {
       while (!tickMarks.isEmpty() && tickMarks.first() <= currentTick) {
          Long tick = tickMarks.first();
          tickMarks.remove(tick);
@@ -312,10 +318,33 @@ public class DelayedInputStream extends InputStream implements TickListener, Del
          currentAvailableEnd = end;
    }
 
-   // TODO test this
    @Override
    public void setDelay(long delay) {
       this.delay = delay;
+
+      long longestAcceptableDeadline = currentTick + delay;
+      List<Long> toDelete = new LinkedList<>();
+      for (Long tick : tickMarks)
+         if (tick > longestAcceptableDeadline)
+            toDelete.add(tick);
+
+      for (Long tick : toDelete) {
+         int previousVirtualEnd = tick_virtualEnd.get(tick);
+         tickMarks.remove(tick);
+         tick_virtualEnd.remove(tick);
+
+         // insert tick-end pair (longestAcceptableDeadline, previousVirtualEnd) if not
+         // already a pair present (tick, virtualEnd) where currentDeadline > previousVirtualEnd
+
+         long currentVirtualEnd = -1;
+         if (tickMarks.contains(longestAcceptableDeadline))
+            currentVirtualEnd = tick_virtualEnd.get(longestAcceptableDeadline);
+
+         tickMarks.add(longestAcceptableDeadline);
+         if (currentVirtualEnd <= previousVirtualEnd)
+            tick_virtualEnd.put(longestAcceptableDeadline, previousVirtualEnd);
+      }
+      handleNewTickMarks();
    }
 
    @Override

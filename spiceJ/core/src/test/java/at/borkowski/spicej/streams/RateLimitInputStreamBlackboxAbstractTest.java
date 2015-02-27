@@ -26,7 +26,7 @@ public abstract class RateLimitInputStreamBlackboxAbstractTest {
       pos = new PipedOutputStream(pis);
 
       t = new SimulationTickSource();
-      sut = new RateLimitInputStream(pis, t, 10, getPrescaler());
+      sut = new RateLimitInputStream(pis, t, 10, getPrescale());
       sut.setNonBlocking(true);
       sut.test__SetIdleNotify(new IdleNotify() {
 
@@ -40,7 +40,7 @@ public abstract class RateLimitInputStreamBlackboxAbstractTest {
 
       t.advance(); // enter t = 0
 
-      for (int i = 0; i < getPrescaler(); i++) {
+      for (int i = 0; i < getPrescale(); i++) {
          t.advance(); // enter t = 1 * prescaler
          t.advance(); // enter t = 2 * prescaler
          t.advance(); // enter t = 3 * prescaler
@@ -49,18 +49,17 @@ public abstract class RateLimitInputStreamBlackboxAbstractTest {
       recorder = new InputStreamReaderRecorder(t);
    }
 
-   // TODO: rename to getPrescale
-   protected abstract int getPrescaler();
+   protected abstract int getPrescale();
    
    @Before
    public void testByteRateSpecificGetters() {
       assertEquals(10, sut.getByteRate());
-      assertEquals(getPrescaler(), sut.getPrescale());
+      assertEquals(getPrescale(), sut.getPrescale());
    }
 
    private void test(int blockSize, long[] expected, boolean boring) throws IOException {
       for (int i = 0; i < expected.length; i++)
-         expected[i] *= getPrescaler();
+         expected[i] *= getPrescale();
 
       sut.setBoring(boring);
       recorder.startRecording(sut, expected.length, blockSize);

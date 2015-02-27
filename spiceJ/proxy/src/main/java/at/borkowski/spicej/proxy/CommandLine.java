@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.beust.jcommander.Parameter;
 
-// TODO add jitter options
 public class CommandLine {
    @Parameter(description = "localport:[remotehost:]remoteport", required = true)
    public List<String> proxyDescription;

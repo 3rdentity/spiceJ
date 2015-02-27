@@ -1,5 +1,7 @@
 package at.borkowski.spicej.streams;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 
 import org.junit.Before;
@@ -47,7 +49,14 @@ public abstract class RateLimitInputStreamBlackboxAbstractTest {
       recorder = new InputStreamReaderRecorder(t);
    }
 
+   // TODO: rename to getPrescale
    protected abstract int getPrescaler();
+   
+   @Before
+   public void testByteRateSpecificGetters() {
+      assertEquals(10, sut.getByteRate());
+      assertEquals(getPrescaler(), sut.getPrescale());
+   }
 
    private void test(int blockSize, long[] expected, boolean boring) throws IOException {
       for (int i = 0; i < expected.length; i++)

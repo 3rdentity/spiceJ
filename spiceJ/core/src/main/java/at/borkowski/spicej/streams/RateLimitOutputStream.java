@@ -36,13 +36,11 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
       this.rateHelper = new RateHelper(tickSource, byteRate, prescale);
    }
 
-   // TODO test this
    @Override
    public void setByteRate(int bytesPerTick) {
       rateHelper.setThingsPerTick(bytesPerTick);
    }
 
-   // TODO test this
    @Override
    public int getByteRate() {
       return rateHelper.getThingsPerTick();
@@ -105,7 +103,6 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
       return rateHelper.getPrescale();
    }
 
-   // TODO: test
    @Override
    public void setPrescale(int prescale) {
       rateHelper.setPrescale(prescale);

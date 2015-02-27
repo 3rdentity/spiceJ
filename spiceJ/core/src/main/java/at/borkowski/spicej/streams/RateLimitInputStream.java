@@ -236,7 +236,6 @@ public class RateLimitInputStream extends InputStream implements RateShaper {
       return rateHelper.getPrescale();
    }
 
-   // TODO: test
    @Override
    public void setPrescale(int prescale) {
       rateHelper.setPrescale(prescale);

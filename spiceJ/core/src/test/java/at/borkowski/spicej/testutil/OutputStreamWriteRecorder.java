@@ -59,6 +59,7 @@ public class OutputStreamWriteRecorder extends OutputStream {
 
    public void startRecording(int target) {
       t0 = t.getCurrentTick();
+      count = 0;
       recording = new long[target];
    }
 }

@@ -25,10 +25,10 @@ import at.borkowski.spicej.streams.DelayedInputStream;
  * will not exceed epsilon (except for cases where the error is due to integer
  * rounding, this applies to very low delay values).
  */
-// TODO test this
 public class DelayCalculator {
    private DelayCalculator() {}
 
+   // TODO document this
    public static final float DEFAULT_EPSILON = 0.05F;
 
    public static final long MAX_INTERVAL = 1000 * 1000000;

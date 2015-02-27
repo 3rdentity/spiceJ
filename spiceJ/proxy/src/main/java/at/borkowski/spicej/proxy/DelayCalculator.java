@@ -28,9 +28,14 @@ import at.borkowski.spicej.streams.DelayedInputStream;
 public class DelayCalculator {
    private DelayCalculator() {}
 
-   // TODO document this
+   /**
+    * The default epsilon value (see {@link DelayCalculator}).
+    */
    public static final float DEFAULT_EPSILON = 0.05F;
 
+   /**
+    * The highest acceptable inverval.
+    */
    public static final long MAX_INTERVAL = 1000 * 1000000;
 
    /**

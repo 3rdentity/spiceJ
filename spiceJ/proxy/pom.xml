@@ -4,7 +4,7 @@
   <parent>
     <groupId>at.borkowski.spicej</groupId>
     <artifactId>spicej</artifactId>
-    <version>0.0.7-SNAPSHOT</version>
+    <version>0.0.7</version>
   </parent>
 
   <artifactId>proxy</artifactId>
@@ -49,12 +49,12 @@
     <dependency>
       <groupId>at.borkowski.spicej</groupId>
       <artifactId>core</artifactId>
-      <version>0.0.7-SNAPSHOT</version>
+      <version>0.0.7</version>
     </dependency>
     <dependency>
       <groupId>at.borkowski.spicej</groupId>
       <artifactId>real-time</artifactId>
-      <version>0.0.7-SNAPSHOT</version>
+      <version>0.0.7</version>
     </dependency>
 
     <!-- Command line parsing -->

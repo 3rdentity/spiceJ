@@ -7,8 +7,10 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import at.borkowski.spicej.Streams;
-import at.borkowski.spicej.impl.RealTimeTickSource;
-import at.borkowski.spicej.proxy.RateCalculator.Result;
+import at.borkowski.spicej.rt.DelayCalculator;
+import at.borkowski.spicej.rt.RateCalculator;
+import at.borkowski.spicej.rt.RealTimeTickSource;
+import at.borkowski.spicej.rt.RateCalculator.Result;
 
 /**
  * A proxy provider for TCP connections allowing for upstream and downstream

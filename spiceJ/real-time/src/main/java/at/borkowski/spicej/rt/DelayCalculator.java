@@ -1,4 +1,4 @@
-package at.borkowski.spicej.proxy;
+package at.borkowski.spicej.rt;
 
 import at.borkowski.spicej.streams.DelayedInputStream;
 

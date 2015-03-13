@@ -4,7 +4,8 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import at.borkowski.spicej.proxy.DelayCalculator.Result;
+import at.borkowski.spicej.rt.DelayCalculator;
+import at.borkowski.spicej.rt.DelayCalculator.Result;
 
 public class DelayCalculatorTest {
    private static final double MAX_ERROR = DelayCalculator.DEFAULT_EPSILON * 2;

@@ -3,9 +3,7 @@ package at.borkowski.spicej.rt;
 import java.io.IOException;
 
 import at.borkowski.spicej.Streams;
-import at.borkowski.spicej.impl.RealTimeTickSource;
-import at.borkowski.spicej.proxy.RateCalculator;
-import at.borkowski.spicej.proxy.RateCalculator.Result;
+import at.borkowski.spicej.rt.RateCalculator.Result;
 import at.borkowski.spicej.streams.RateLimitInputStream;
 import at.borkowski.spicej.streams.util.PipedInputStream;
 import at.borkowski.spicej.streams.util.PipedOutputStream;

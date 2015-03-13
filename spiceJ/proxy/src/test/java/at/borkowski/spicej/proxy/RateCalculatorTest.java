@@ -8,7 +8,8 @@ import java.math.RoundingMode;
 import org.junit.Before;
 import org.junit.Test;
 
-import at.borkowski.spicej.proxy.RateCalculator.Result;
+import at.borkowski.spicej.rt.RateCalculator;
+import at.borkowski.spicej.rt.RateCalculator.Result;
 
 public class RateCalculatorTest {
 

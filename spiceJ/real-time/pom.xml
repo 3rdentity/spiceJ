@@ -7,19 +7,14 @@
     <version>0.0.7-SNAPSHOT</version>
   </parent>
 
-  <artifactId>real-time-tests</artifactId>
-  <name>${project.friendly-name}: Real-Time Tests</name>
-  <description>Real-time tests for spiceJ</description>
+  <artifactId>real-time</artifactId>
+  <name>${project.friendly-name}: Real-Time Functionality</name>
+  <description>Real-time functionality for spiceJ</description>
 
   <dependencies>
     <dependency>
       <groupId>at.borkowski.spicej</groupId>
       <artifactId>core</artifactId>
-      <version>0.0.7-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>at.borkowski.spicej</groupId>
-      <artifactId>proxy</artifactId>
       <version>0.0.7-SNAPSHOT</version>
     </dependency>
 

@@ -1,5 +1,6 @@
-package at.borkowski.spicej.impl;
+package at.borkowski.spicej.rt;
 
+import at.borkowski.spicej.impl.AbstractTickSource;
 import at.borkowski.spicej.ticks.TickListener;
 
 /**

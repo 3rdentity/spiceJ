@@ -3,7 +3,6 @@ package at.borkowski.spicej.rt;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
-import at.borkowski.spicej.impl.RealTimeTickSource;
 import at.borkowski.spicej.impl.SleepWakeup;
 import at.borkowski.spicej.ticks.TickListener;
 

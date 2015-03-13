@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.util.Random;
 
 import at.borkowski.spicej.Streams;
-import at.borkowski.spicej.impl.RealTimeTickSource;
 import at.borkowski.spicej.impl.SleepWakeup;
-import at.borkowski.spicej.proxy.DelayCalculator;
-import at.borkowski.spicej.proxy.DelayCalculator.Result;
+import at.borkowski.spicej.rt.DelayCalculator.Result;
 import at.borkowski.spicej.streams.DelayedInputStream;
 import at.borkowski.spicej.streams.util.PipedInputStream;
 import at.borkowski.spicej.streams.util.PipedOutputStream;

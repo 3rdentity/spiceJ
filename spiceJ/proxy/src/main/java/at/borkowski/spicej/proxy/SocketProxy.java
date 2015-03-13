@@ -18,6 +18,7 @@ import at.borkowski.spicej.rt.RateCalculator.Result;
  * forwards data to and from a connection to a remote port upon local
  * connection. Upstream and downstream rate limitations are possible.
  */
+// TODO test this (coverage!)
 public class SocketProxy implements Runnable {
    final int localPort, remotePort;
    final String remoteHost;

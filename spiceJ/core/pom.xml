@@ -8,6 +8,6 @@
   </parent>
 
   <artifactId>core</artifactId>
-  <name>${project.friendly-name}: Core</name>
+  <name>spiceJ: Core</name>
   <description>The core of spiceJ, containing all elements necessary for shaping Java streams</description>
 </project>

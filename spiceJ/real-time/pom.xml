@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>real-time</artifactId>
-  <name>${project.friendly-name}: Real-Time Functionality</name>
+  <name>spiceJ: Real-Time Functionality</name>
   <description>Real-time functionality for spiceJ</description>
 
   <dependencies>

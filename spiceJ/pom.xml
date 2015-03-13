@@ -5,7 +5,7 @@
   <artifactId>spicej</artifactId>
   <version>0.0.7-SNAPSHOT</version>
 
-  <name>${project.friendly-name}</name>
+  <name>spiceJ</name>
   <url>https://github.com/michael-borkowski/spiceJ</url>
   <description>A network traffic shaper written in Java</description>
 
@@ -22,7 +22,6 @@
     <junit-version>4.12</junit-version>
     <mockito-version>1.9.5</mockito-version>
 
-    <project.friendly-name>spiceJ</project.friendly-name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 

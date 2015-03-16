@@ -9,5 +9,5 @@
 
   <artifactId>core</artifactId>
   <name>spiceJ: Core</name>
-  <description>The core of spiceJ, containing all elements necessary for shaping Java streams</description>
+  <description>The core of spiceJ, capable of shaping Java streams</description>
 </project>

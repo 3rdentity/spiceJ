@@ -9,7 +9,7 @@
 
   <artifactId>proxy</artifactId>
   <name>spiceJ: Proxy</name>
-  <description>The proxy component of spiceJ, containing all elements necessary for creating network proxies for shaping network streams</description>
+  <description>The proxy component of spiceJ, capable of creating network proxies for using the shaping functionality of spiceJ on network streams</description>
 
   <build>
     <plugins>

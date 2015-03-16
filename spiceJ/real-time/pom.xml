@@ -9,7 +9,7 @@
 
   <artifactId>real-time</artifactId>
   <name>spiceJ: Real-Time Functionality</name>
-  <description>Real-time functionality for spiceJ</description>
+  <description>Components for binding the shaping spiceJ to real time</description>
 
   <dependencies>
     <dependency>

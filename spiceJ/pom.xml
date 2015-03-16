@@ -3,7 +3,7 @@
 
   <groupId>at.borkowski.spicej</groupId>
   <artifactId>spicej</artifactId>
-  <version>0.0.8</version>
+  <version>0.0.9-SNAPSHOT</version>
 
   <name>spiceJ</name>
   <description>A traffic shaper written in Java</description>
@@ -176,7 +176,7 @@
     <connection>${scm-url}</connection>
     <url>${scm-url}</url>
     <developerConnection>${scm-url}</developerConnection>
-    <tag>0.0.8</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <licenses>

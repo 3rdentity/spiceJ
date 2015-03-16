@@ -36,7 +36,7 @@ public class RateLimitOutputStreamBlackboxTest {
       t.advance();
       t.advance();
    }
-   
+
    @Before
    public void testByteRateSpecificGetters() {
       assertEquals(10, sut.getByteRate());

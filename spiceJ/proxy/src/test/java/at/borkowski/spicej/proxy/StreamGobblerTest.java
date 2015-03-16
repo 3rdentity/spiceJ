@@ -84,7 +84,7 @@ public class StreamGobblerTest {
 
       verify(pis, never()).close();
       verify(pos, never()).close();
-      
+
       sut.close();
 
       verify(pis, atLeast(1)).close();

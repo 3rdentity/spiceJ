@@ -19,11 +19,11 @@ public class CommandLine {
    // TODO implement suffixes
    @Parameter(names = { "--rate", "-r" }, description = "The byte rate to allow in both directions, in bytes per second (can't be used with -a/--rate-send or -b/--rate-receive)")
    public Float rate;
-   
-   @Parameter(names = { "--delay-send", "-A"}, description = "The delay to add to the stream towards the remote host, in milliseconds")
+
+   @Parameter(names = { "--delay-send", "-A" }, description = "The delay to add to the stream towards the remote host, in milliseconds")
    public Float delayReceive;
-   
-   @Parameter(names = { "--delay-receive", "-B"}, description = "The delay to add to the stream from the remote hosts, in milliseconds")
+
+   @Parameter(names = { "--delay-receive", "-B" }, description = "The delay to add to the stream from the remote hosts, in milliseconds")
    public Float delaySend;
 
    @Parameter(names = { "--delay", "-d" }, description = "The delay to add in both directions, in milliseconds (can't be used with -A/--delay-send or -B/--delay-receive)")

@@ -88,7 +88,7 @@ public class DelayedOutputStream extends OutputStream implements TickListener, D
          else
             sleep.sleep();
 
-      if(end + len >= buffer.length) {
+      if (end + len >= buffer.length) {
          int chunk1 = buffer.length - end;
          System.arraycopy(b, off, buffer, end, chunk1);
          end = 0;
@@ -125,7 +125,7 @@ public class DelayedOutputStream extends OutputStream implements TickListener, D
 
       if (tickMarks.isEmpty())
          currentAvailableEnd = end;
-      
+
       int writable = bufferedBytes(currentAvailableEnd);
 
       if (writable == 0)

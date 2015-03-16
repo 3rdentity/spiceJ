@@ -50,7 +50,7 @@ public abstract class RateLimitInputStreamBlackboxAbstractTest {
    }
 
    protected abstract int getPrescale();
-   
+
    @Before
    public void testByteRateSpecificGetters() {
       assertEquals(10, sut.getByteRate());

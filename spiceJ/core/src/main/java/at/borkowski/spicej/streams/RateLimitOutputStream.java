@@ -97,7 +97,7 @@ public class RateLimitOutputStream extends OutputStream implements RateShaper {
    public void setNonBlocking(boolean nonBlocking) {
       rateHelper.setNonBlocking(nonBlocking);
    }
-   
+
    @Override
    public int getPrescale() {
       return rateHelper.getPrescale();

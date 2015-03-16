@@ -20,9 +20,9 @@ public class StreamsTest {
    public void testLimitRateInputStream() {
       InputStream base = mock(InputStream.class);
       TickSource t = mock(TickSource.class);
-      
+
       RateLimitInputStream result = Streams.limitRate(base, t, 123, 456);
-      
+
       assertSame(base, result.getBaseStream());
       assertSame(t, result.getTickSource());
       assertEquals(123, result.getByteRate());
@@ -33,9 +33,9 @@ public class StreamsTest {
    public void testLimitRateOutputStream() {
       OutputStream base = mock(OutputStream.class);
       TickSource t = mock(TickSource.class);
-      
+
       RateLimitOutputStream result = Streams.limitRate(base, t, 123, 456);
-      
+
       assertSame(base, result.getBaseStream());
       assertSame(t, result.getTickSource());
       assertEquals(123, result.getByteRate());
@@ -46,9 +46,9 @@ public class StreamsTest {
    public void testAddDelayInputStream() {
       InputStream base = mock(InputStream.class);
       TickSource t = mock(TickSource.class);
-      
+
       DelayedInputStream result = Streams.addDelay(base, t, 123, 456);
-      
+
       assertSame(base, result.getBaseStream());
       assertSame(t, result.getTickSource());
       assertEquals(123, result.getDelay());

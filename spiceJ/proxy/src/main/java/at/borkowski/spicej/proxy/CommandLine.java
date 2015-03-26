@@ -8,15 +8,12 @@ public class CommandLine {
    @Parameter(description = "localport:[remotehost:]remoteport", required = true)
    public List<String> proxyDescription;
 
-   // TODO implement suffixes
    @Parameter(names = { "--rate-send", "-a" }, description = "The byte rate to allow towards the remote host, in bytes per second")
    public Float rateSend;
 
-   // TODO implement suffixes
    @Parameter(names = { "--rate-receive", "-b" }, description = "The byte rate to allow from the remote host, in bytes per second")
    public Float rateReceive;
 
-   // TODO implement suffixes
    @Parameter(names = { "--rate", "-r" }, description = "The byte rate to allow in both directions, in bytes per second (can't be used with -a/--rate-send or -b/--rate-receive)")
    public Float rate;
 

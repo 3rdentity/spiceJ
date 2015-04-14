@@ -8,6 +8,7 @@
  *     - removed JavaDoc
  *     - two calls to notifyAll() (in read() and read(byte[], int, int)
  *     - removal of the reader/writer alive detection mechanism (error prone and performance lowering)
+ *     - addition of a mechanism to avoid deadlocks
  *
  *   According to [1], the JDK source code is distributed under GNU GPL v2, which permits redistribution
  *   and modification.
@@ -45,6 +46,8 @@ package at.borkowski.spicej.streams.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import at.borkowski.spicej.WouldBlockException;
+
 public class PipedInputStream extends InputStream {
     boolean closedByWriter = false;
     volatile boolean closedByReader = false;
@@ -62,6 +65,8 @@ public class PipedInputStream extends InputStream {
     protected int in = -1;
 
     protected int out = 0;
+    
+    protected boolean exceptionOnDeadlock = false;
 
     public PipedInputStream(PipedOutputStream src) throws IOException {
         this(src, DEFAULT_PIPE_SIZE);
@@ -79,6 +84,10 @@ public class PipedInputStream extends InputStream {
 
     public PipedInputStream(int pipeSize) {
         initPipe(pipeSize);
+    }
+    
+    public void setExceptionOnDeadlock(boolean exceptionOnDeadlock) {
+       this.exceptionOnDeadlock = exceptionOnDeadlock;
     }
 
     private void initPipe(int pipeSize) {
@@ -147,6 +156,7 @@ public class PipedInputStream extends InputStream {
 
     private void awaitSpace() throws IOException {
         while (in == out) {
+            if(exceptionOnDeadlock) throw new WouldBlockException();
             checkStateForReceive();
 
             /* full: kick any waiting readers */
@@ -172,6 +182,7 @@ public class PipedInputStream extends InputStream {
         }
 
         while (in < 0) {
+            if(exceptionOnDeadlock) throw new WouldBlockException();
             if (closedByWriter) {
                 /* closed by writer, return EOF */
                 return -1;
